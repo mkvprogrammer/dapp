@@ -1,0 +1,183 @@
+version: "3.8"
+
+services:
+
+  # в начале необходимо запустить 2 контейнера для предварительной
+  # подготовки БД для двух нод
+  node1-init:
+    image: ethereum/client-go:v1.13.15
+    container_name: poa-node1-init
+    # Переопределяем стандартный запуск, чтобы выполнить только инициализацию
+    entrypoint: ["geth", "--datadir", "/data", "init", "/genesis.json"]
+    volumes:
+      - ./node1_data:/data
+      - ./genesis.json:/genesis.json:ro
+  
+  node2-init:
+    image: ethereum/client-go:v1.13.15
+    container_name: poa-node2-init
+    # Переопределяем стандартный запуск, чтобы выполнить только инициализацию
+    entrypoint: ["geth", "--datadir", "/data", "init", "/genesis.json"]
+    volumes:
+      - ./node2_data:/data
+      - ./genesis.json:/genesis.json:ro
+
+  # --- УЗЕЛ 1 (Основной валидатор) ---
+  node1:
+    image: ethereum/client-go:v1.13.15
+    container_name: poa-node1
+    restart: unless-stopped # если нода упала - автоматический перезапуск
+    
+    depends_on:
+      node1-init:
+        condition: service_completed_successfully
+    
+    command: >
+      --datadir /data
+      --networkid 1337
+      
+      --http
+      --http.addr 0.0.0.0
+      --http.port 8545
+      --http.vhosts "*"
+      --http.corsdomain "*"
+      --http.api eth,net,web3,clique,admin,txpool,debug,personal
+
+      --ws
+      --ws.addr 0.0.0.0
+      --ws.port 8546
+      --ws.origins "*"
+      --ws.api eth,net,web3
+
+      --syncmode full
+      
+      --mine
+      --miner.gasprice 0
+      --miner.etherbase ${VALIDATOR_1_ADDRESS}
+
+      --unlock ${VALIDATOR_1_ADDRESS}
+      --password /data/password.txt
+      --allow-insecure-unlock
+
+      --port 30303
+
+      --verbosity 3
+    ports:
+      - "8541:8545"  # RPC Node 1
+      - "8551:8546"  # WS Node 1
+      - "30303:30303/tcp"
+      - "30303:30303/udp"
+      
+    volumes:
+      - ./node1_data:/data
+      - ./genesis.json:/genesis.json:ro
+      - ./password.txt:/data/password.txt:ro
+    
+    environment:
+      - VALIDATOR_1_ADDRESS=${VALIDATOR_1_ADDRESS}
+
+    networks:
+      poa_net:
+        ipv4_address: 172.30.0.10
+
+  # --- УЗЕЛ 2 (Peer/RPC) ---
+  node2:
+    image: ethereum/client-go:v1.13.15
+    container_name: poa-node2
+    restart: unless-stopped
+    
+    depends_on: # Ждем старта первой ноды
+      node2-init:
+        condition: service_completed_successfully
+      node1:
+        condition: service_started
+    
+    command: >
+      --datadir /data
+      --networkid 1337
+      
+      --http
+      --http.addr 0.0.0.0
+      --http.port 8545
+      --http.vhosts "*"
+      --http.corsdomain "*"
+      --http.api eth,net,web3,clique,admin
+
+      --ws
+      --ws.addr 0.0.0.0
+      --ws.port 8546
+      --ws.origins "*"
+      --ws.api eth,net,web3
+
+      --syncmode full
+
+      --bootnodes enode://$(cat /data/geth/nodekey.pub 2>/dev/null || echo '')@172.30.0.10:30303
+
+      --port 30304
+
+      --verbosity 3
+    
+    ports:
+      - "8542:8545"  # RPC Node 2 (другой порт!)
+      - "8552:8546"  # WS Node 2
+      - "30304:30304/tcp" # P2P Node 2 (маппим на другой внешний порт)
+      - "30304:30304/udp"
+    
+    volumes:
+      - ./node2_data:/data
+      - ./genesis.json:/genesis.json:ro
+      - ./password.txt:/data/password.txt:ro
+    
+    environment:
+      - VALIDATOR_2_ADDRESS=${VALIDATOR_2_ADDRESS}
+    
+    networks:
+      poa_net:
+        ipv4_address: 172.30.0.20
+
+  # --- Инфраструктура (БД, Redis) ---
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - poa_net
+  
+  pgadmin: # для работы с БД через web-интерфейс
+    image: dpage/pgadmin4:latest
+    container_name: poa-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com  # Логин для входа в веб-панель
+      PGADMIN_DEFAULT_PASSWORD: adminpassword # Пароль для входа в веб-панель
+    ports:
+      - "8080:80" # Откроет интерфейс на http://localhost:8080
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - db
+    networks:
+      - poa_net
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - poa_net
+
+networks:
+  poa_net:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+
+volumes: # сохранение состояния БД и интерфейса pgAdmin вне зависимости от контейнера
+  pgdata:
+  pgadmin_data:

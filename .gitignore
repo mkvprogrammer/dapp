@@ -1,0 +1,26 @@
+# Игнорируем базу данных и ключи Geth
+infra/data/
+**/chaindata/
+**/ancient/
+**/keystore/
+infra/node1_data/
+infra/node2_data/
+infra/static-nodes.json
+infra/genesis.json
+
+# Игнорируем локальные пароли
+infra/password.txt
+
+# Python
+**/__pycache__/
+**/*.pyc
+**/venv/
+**/.venv/
+**/.mypy_cache
+**/.vscode
+
+# Ключи и секреты
+infra/scripts/generated_keys.json
+infra/.env
+contracts/.env
+infra/password.txt

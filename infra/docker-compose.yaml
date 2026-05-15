@@ -1,0 +1,194 @@
+services:
+  # --------------------------------------------------------------------------
+  # ЭТАП 1: ИНИЦИАЛИЗАЦИЯ БАЗ ДАННЫХ НОД (Запускаются один раз и завершаются)
+  # --------------------------------------------------------------------------
+
+  # Сервис для инициализации папки данных первой ноды.
+  # Он берет genesis.json и создает структуру блоков и ключей в ./node1_data.
+  node1-init:
+    image: ethereum/client-go:v1.13.15
+    # Переопределяем entrypoint, чтобы запустить только команду init, а не полноценную ноду
+    entrypoint: ["geth"]
+    command: ["--datadir", "/data", "init", "/genesis.json"]
+    volumes:
+      # Монтируем локальную папку, куда будет записана инициализированная БД
+      - ./node1_data:/data
+      # Монтируем файл генезиса только для чтения
+      - ./genesis.json:/genesis.json:ro
+
+  # Аналогичный сервис для второй ноды.
+  # Важно: обе ноды должны быть инициализированы одним и тем же genesis.json.
+  node2-init:
+    image: ethereum/client-go:v1.13.15
+    entrypoint: ["geth"]
+    command: ["--datadir", "/data", "init", "/genesis.json"]
+    volumes:
+      - ./node2_data:/data
+      - ./genesis.json:/genesis.json:ro
+
+  # --------------------------------------------------------------------------
+  # ЭТАП 2: РАБОЧИЕ УЗЛЫ СЕТИ (Geth Nodes)
+  # --------------------------------------------------------------------------
+
+  # --- УЗЕЛ 1 (Validator 1) ---
+  node1:
+    image: ethereum/client-go:v1.13.15
+    container_name: poa-node1
+    restart: unless-stopped # Автоматический перезапуск при падении
+    
+    # Ждем успешного завершения инициализации перед стартом самой ноды
+    depends_on:
+      node1-init:
+        condition: service_completed_successfully
+    entrypoint: ["geth"]
+    command:
+      - --datadir=/data
+      - --networkid=1337
+      - --port=30303
+      - --nat=extip:172.30.0.10
+      - --bootnodes=${BOOTNODES}
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.vhosts=*
+      - --http.corsdomain=*
+      - --http.api=eth,net,web3,clique,admin,txpool
+      - --ws
+      - --ws.addr=0.0.0.0
+      - --ws.port=8546
+      - --ws.origins=*
+      - --ws.api=eth,net,web3
+      - --syncmode=full
+      - --mine
+      - --miner.gasprice=0
+      - --miner.etherbase=${VALIDATOR_1_ADDRESS}
+      - --unlock=${VALIDATOR_1_ADDRESS}
+      - --password=/data/password.txt
+      - --allow-insecure-unlock
+      - --verbosity=3
+    ports:
+      - "8541:8545"
+      - "8551:8546"
+      - "30303:30303/tcp"
+      - "30303:30303/udp"
+    volumes:
+      # Папка с данными ноды (блокчейн, ключи, конфиги)
+      - ./node1_data:/data
+      # Пароль для разблокировки аккаунта
+      - ./password.txt:/data/password.txt:ro
+    networks:
+      poa_net:
+        # Фиксируем статический IP внутри Docker-сети
+        ipv4_address: 172.30.0.10
+
+  # --- УЗЕЛ 2 (Validator 2) ---
+  node2:
+    image: ethereum/client-go:v1.13.15
+    container_name: poa-node2
+    restart: unless-stopped
+    
+    # Зависимости:
+    # 1. Сначала должна пройти инициализация БД этой ноды.
+    # 2. Ждем старта node1, чтобы было к кому подключаться по bootnodes.
+    depends_on:
+      node2-init:
+        condition: service_completed_successfully
+      node1:
+        condition: service_started
+    
+    entrypoint: ["geth"]
+    command:
+      - --datadir=/data
+      - --networkid=1337
+      - --port=30304
+      - --nat=extip:172.30.0.20
+      - --bootnodes=${BOOTNODES}
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.vhosts=*
+      - --http.corsdomain=*
+      - --http.api=eth,net,web3,clique,admin,txpool
+      - --ws
+      - --ws.addr=0.0.0.0
+      - --ws.port=8546
+      - --ws.origins=*
+      - --ws.api=eth,net,web3
+      - --syncmode=full
+      - --mine
+      - --miner.gasprice=0
+      - --miner.etherbase=${VALIDATOR_2_ADDRESS}
+      - --unlock=${VALIDATOR_2_ADDRESS}
+      - --password=/data/password.txt
+      - --allow-insecure-unlock
+      - --verbosity=3
+    ports:
+      # Проброс на другие порты хоста, чтобы не конфликтовать с node1
+      - "8542:8545"
+      - "8552:8546"
+      - "30304:30304/tcp"
+      - "30304:30304/udp"
+    volumes:
+      - ./node2_data:/data
+      - ./password.txt:/data/password.txt:ro
+    networks:
+      poa_net:
+        ipv4_address: 172.30.0.20
+
+  # --------------------------------------------------------------------------
+  # ЭТАП 3: ИНФРАСТРУКТУРА ПРИЛОЖЕНИЯ (Backend Support)
+  # --------------------------------------------------------------------------
+  
+  # PostgreSQL - основная база данных для приложения (FastAPI)
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432" # Доступ к БД с хост-машины (для миграций, DBeaver и т.д.)
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Именованный том для сохранения данных БД
+    networks:
+      - poa_net # Подключаем к той же сети, чтобы бэкенд мог обращаться к нодам по IP/имени
+
+  # PgAdmin - веб-интерфейс для управления PostgreSQL
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
+    ports:
+      - "8080:80" # Веб-интерфейс доступен по адресу http://localhost:8080
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin # Сохранение настроек PgAdmin
+    networks:
+      - poa_net
+
+  # Redis - кэш или брокер сообщений (для Celery, сессий и т.д.)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - poa_net
+
+# --------------------------------------------------------------------------
+# СЕТЕВАЯ КОНФИГУРАЦИЯ
+# --------------------------------------------------------------------------
+networks:
+  poa_net:
+    ipam:
+      config:
+        # Создаем подсеть 172.30.0.0/16.
+        # Это позволяет нам жестко задавать IP адреса (172.30.0.10, .20) в сервисах выше.
+        # Без этого блока Docker выдавал бы случайные IP, и static-nodes/bootnodes сломались бы.
+        - subnet: 172.30.0.0/16
+
+# --------------------------------------------------------------------------
+# ТОМА (VOLUMES)
+# --------------------------------------------------------------------------
+volumes:
+  pgdata:
+  pgadmin_data:
