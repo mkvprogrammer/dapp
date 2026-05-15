@@ -24,3 +24,6 @@ infra/scripts/generated_keys.json
 infra/.env
 contracts/.env
 infra/password.txt
+
+# Старый docker-файл
+infra/blabla.yaml
