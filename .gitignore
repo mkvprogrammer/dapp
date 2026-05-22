@@ -1,4 +1,20 @@
-# Игнорируем базу данных и ключи Geth
+# --- ENV & SECRETS (САМОЕ ВАЖНОЕ) ---
+.env
+.env.local
+.env.production
+**/.env
+
+# --- NODE & HARDHAT ---
+node_modules/
+cache/
+artifacts/
+ignition/deployments/
+typechain/
+typechain-types/
+coverage/
+coverage.json
+
+# --- INFRA & GETH (Ваши настройки) ---
 infra/data/
 **/chaindata/
 **/ancient/
@@ -7,23 +23,21 @@ infra/node1_data/
 infra/node2_data/
 infra/static-nodes.json
 infra/genesis.json
-
-# Игнорируем локальные пароли
 infra/password.txt
+infra/scripts/generated_keys.json
+infra/blabla.yaml
 
-# Python
+# --- PYTHON ---
 **/__pycache__/
 **/*.pyc
 **/venv/
 **/.venv/
 **/.mypy_cache
-**/.vscode
 
-# Ключи и секреты
-infra/scripts/generated_keys.json
-infra/.env
-contracts/.env
-infra/password.txt
-
-# Старый docker-файл
-infra/blabla.yaml
+# --- IDE & OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
