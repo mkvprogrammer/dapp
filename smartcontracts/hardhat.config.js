@@ -1,21 +1,21 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("dotenv").config(); // <-- Добавлено
 
 module.exports = {
-  solidity: "0.8.28", // Убедитесь, что эта версия совпадает с pragma в ваших контрактах
+  solidity: "0.8.28",
   networks: {
     localPoA: {
       url: "http://127.0.0.1:8541",
       chainId: 1337,
-      gas: 0,       // Или уберите эту строку, если нода требует авто-расчет
-      gasPrice: 0,  // Или уберите эту строку
+      gas: 0,
+      gasPrice: 0,
       accounts: [
-        "0xВАШ_ПРИВАТНЫЙ_КЛЮЧ_ВАЛИДАТОРА", 
-        "0xВАШ_ПРИВАТНЫЙ_КЛЮЧ_РЕЛЕЙЕРА"    
+        process.env.PRIVATE_KEY_VALIDATOR, // <-- Читаем из .env
+        process.env.PRIVATE_KEY_RELAYER    // <-- Читаем из .env
       ]
     }
   }
 };
-
 
 // require("@nomicfoundation/hardhat-toolbox");
 
