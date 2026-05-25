@@ -19,8 +19,9 @@ contract ProjectRegistry is AccessControl {
     // Объявляем структуру (пользовательский тип данных) для хранения настроек каждого проекта.
     struct ProjectSettings {
         string name;              // Название проекта/курса (хранится динамически)
+        address owner;            // Адрес создателя/владельца проекта
         uint256 refundRate;       // Процент возврата средств в базисных пунктах (например, 8000 = 80.00%)
-        uint8[4] penaltySchedule; // Фиксированный массив из 4 элементов для штрафов в зависимости от времени
+        uint16[4] penaltySchedule; // Фиксированный массив из 4 элементов для штрафов в зависимости от времени
         bool isActive;            // Флаг: существует/активен ли данный проект
     }
 
@@ -32,11 +33,11 @@ contract ProjectRegistry is AccessControl {
 
     // События (Events) для уведомления внешних приложений (сайтов, бэкенда) о важных действиях.
     // Ключевое слово indexed позволяет быстро фильтровать историю по projectId.
-    event ProjectCreated(uint256 indexed projectId, string name, address organizer);
+    event ProjectCreated(uint256 indexed projectId, string name, address indexed owner);
     event SettingsUpdated(
         uint256 indexed projectId, 
         uint256 refundRate, 
-        uint8[4] penaltySchedule, 
+        uint16[4] penaltySchedule, 
         bool isActive
     );
 
@@ -51,11 +52,12 @@ contract ProjectRegistry is AccessControl {
      * @dev Создание нового предмета/проекта
      * Только пользователи с ролью ORGANIZER_ROLE могут вызывать эту функцию.
      * external экономит газ на чтение аргументов, так как функция вызывается только извне.
+     * Владелец автоматически = msg.sender
      */
     function createProject(
         string memory name,             // Имя передается в memory, так как это динамический тип данных
         uint256 refundRate, 
-        uint8[4] memory penaltySchedule // Фиксированный массив также временно создается в памяти memory
+        uint16[4] memory penaltySchedule // Фиксированный массив также временно создается в памяти memory
     ) external onlyRole(ORGANIZER_ROLE) returns (uint256) {
         
         // Присваиваем текущее значение счетчика локальной переменной id,
@@ -65,6 +67,7 @@ contract ProjectRegistry is AccessControl {
         // Записываем новую структуру настроек в storage-маппинг по сгенерированному id.
         projects[id] = ProjectSettings({
             name: name,
+            owner: msg.sender,
             refundRate: refundRate,
             penaltySchedule: penaltySchedule,
             isActive: true // Активируем проект, чтобы его можно было использовать
@@ -84,12 +87,14 @@ contract ProjectRegistry is AccessControl {
     function setProjectSettings(
         uint256 projectId, 
         uint256 refundRate, 
-        uint8[4] memory penaltySchedule,
+        uint16[4] memory penaltySchedule,
         bool isActive
     ) external onlyRole(ORGANIZER_ROLE) {
 
         // защита от вызова несуществующего проекта
         require(bytes(projects[projectId].name).length > 0, "Project does not exist");
+        // защита от несанкционированного доступа
+        require(projects[projectId].owner == msg.sender || hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Not owner");
 
         // Перезаписываем параметры в постоянной памяти (storage) блокчейна.
         projects[projectId].refundRate = refundRate;
@@ -101,6 +106,13 @@ contract ProjectRegistry is AccessControl {
     }
 
     /**
+     * @dev Геттер для UniversityToken: проверка владения проектом
+     */
+    function getProjectOwner(uint256 projectId) external view returns (address) {
+        return projects[projectId].owner;
+    }
+
+    /**
      * @dev Получение информации о проекте.
      * Функция помечена как view, так как она только читает данные и не тратит газ при вызове пользователем.
      */
@@ -108,9 +120,10 @@ contract ProjectRegistry is AccessControl {
         external 
         view 
         returns (
-            string memory name, 
+            string memory name,
+            address owner,
             uint256 refundRate, 
-            uint8[4] memory penaltySchedule, 
+            uint16[4] memory penaltySchedule, 
             bool isActive
         ) 
     {
@@ -120,6 +133,6 @@ contract ProjectRegistry is AccessControl {
         ProjectSettings storage p = projects[projectId];
         
         // Возвращаем все данные, включая текущий статус активности
-        return (p.name, p.refundRate, p.penaltySchedule, p.isActive);
+        return (p.name, p.owner, p.refundRate, p.penaltySchedule, p.isActive);
     }
 }

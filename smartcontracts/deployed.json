@@ -1,0 +1,14 @@
+{
+  "network": "localPoA",
+  "chainId": 1337,
+  "contracts": {
+    "UniversityToken": "0xdccba7B35aA620b2a8F4c83cD32a91Fe285AD6e8",
+    "ProjectRegistry": "0x264883Bcc7BAc4fD88CA6Cea319AF8Bbf0b0a7e2",
+    "AuctionManager": "0x6371fC91dc919Ad004fdfdE94A94137104427b5C"
+  },
+  "roles": {
+    "admin": "0xf9FF7A00d29B81c6306fb6D40cb97387028510D7",
+    "organizer": "0xae70f2bf3036EC77981e3D96cE43Ca99ffe418B0",
+    "relayer": "0x1979809cc56c22eaFA3abdeb6C2800520206E22c"
+  }
+}
