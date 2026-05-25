@@ -129,6 +129,8 @@ def save_env_file(base_dir, v1_addr, v2_addr):
     db_user = "dev"
     db_pass = "devpass_secure_123"
     db_name = "unidapp"
+    db_host = "127.0.0.1"
+    db_port = "5433"
 
     # Если .env уже существует, пытаемся сохранить текущие настройки БД
     if env_path.exists():
@@ -143,6 +145,12 @@ def save_env_file(base_dir, v1_addr, v2_addr):
                 if line.startswith("DB_NAME="):
                     db_name = line.strip().split("=")[1]
 
+                if line.startswith("DB_HOST="):
+                    db_host = line.strip().split("=")[1]
+
+                if line.startswith("DB_PORT="):
+                    db_port = line.strip().split("=")[1]
+
     content = f"""
 # --- Конфигурация Блокчейна ---
 VALIDATOR_1_ADDRESS={v1_addr}
@@ -152,6 +160,8 @@ VALIDATOR_2_ADDRESS={v2_addr}
 DB_USER={db_user}
 DB_PASSWORD={db_pass}
 DB_NAME={db_name}
+DB_HOST={db_host}
+DB_PORT={db_port}
 """
 
     with open(env_path, "w", encoding="utf-8") as f:

@@ -147,7 +147,8 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5432:5432" # Доступ к БД с хост-машины (для миграций, DBeaver и т.д.)
+      # 5433 на хосте — чтобы не конфликтовать с локальным PostgreSQL Windows (часто занимает 5432)
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data # Именованный том для сохранения данных БД
     networks:
