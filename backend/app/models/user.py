@@ -34,6 +34,7 @@ class User(Base):
     full_name: Mapped[str] = mapped_column(String(150))
     password_hash: Mapped[str] = mapped_column(String(255))
     wallet_address: Mapped[str] = mapped_column(String(42), unique=True)
+    encrypted_private_key: Mapped[str] = mapped_column(String(500))
     
     # По умолчанию поле NOT NULL (nullable=False). Если нужно разрешить NULL,
     # пишется Mapped[str | None]

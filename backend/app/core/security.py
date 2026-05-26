@@ -49,6 +49,26 @@ def create_access_token(
     )
 
 
+def decode_access_token(token: str) -> dict[str, Any]:
+    """
+    Декодирует и проверяет access JWT.
+
+    Raises:
+        jwt.ExpiredSignatureError: срок действия истёк.
+        jwt.InvalidTokenError: неверная подпись или формат.
+    """
+    payload: dict[str, Any] = jwt.decode(
+        token,
+        settings.jwt_secret_key,
+        algorithms=[ALGORITHM],
+    )
+    if payload.get("type") != "access":
+        raise jwt.InvalidTokenError("Invalid token type")
+    if not payload.get("sub"):
+        raise jwt.InvalidTokenError("Missing subject")
+    return payload
+
+
 def create_refresh_token(data: dict[str, Any]) -> str:
     """
     Генерирует долгоживущий JWT refresh-токен (по умолчанию 7 дней).

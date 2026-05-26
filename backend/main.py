@@ -4,7 +4,10 @@ from fastapi import FastAPI
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
+from app.api.api import api_router
 from app.core.config import get_settings, settings
+from app.core.exceptions import DomainException
+from app.core.handlers import domain_exception_handler
 from database import engine
 
 
@@ -34,6 +37,12 @@ app = FastAPI(
     title=settings.app_name,
     lifespan=lifespan,
 )
+
+# Глобальный перехват доменных ошибок (сервисы → HTTP)
+app.add_exception_handler(DomainException, domain_exception_handler)
+
+# API v1: /api/v1/auth/...
+app.include_router(api_router)
 
 
 @app.get("/")
