@@ -11,6 +11,7 @@ if str(_backend_dir) not in sys.path:
     sys.path.insert(0, str(_backend_dir))
 
 from app.core.config import settings  # noqa: E402
+import app.models  # noqa: E402, F401 — регистрация таблиц в Base.metadata
 from database import Base  # noqa: E402
 
 # Извлекает объект конфигурации из файла alembic.ini

@@ -41,6 +41,15 @@ class Settings(BaseSettings):
     app_name: str = "UniDApp API"
     debug: bool = False
 
+    # JWT (security.py)
+    jwt_secret_key: str = "change-me-in-production-use-long-random-string"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
+    refresh_token_expire_days: int = 7
+
+    # Локальная PoA-нода (docker-compose: node1 → localhost:8541)
+    blockchain_url: str = "http://127.0.0.1:8541"
+
     def _credentials(self) -> str:
         """Возвращает URL-строку для подключения к БД"""
         # экранирование логина и пароля для вставки в URL-адрес
