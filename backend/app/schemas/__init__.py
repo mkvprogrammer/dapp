@@ -1,3 +1,4 @@
+from app.schemas.admin import ChangeRoleRequest
 from app.schemas.auth import (
     RefreshTokenRequest,
     TokenResponse,
@@ -9,6 +10,7 @@ from app.schemas.auth import (
 )
 
 __all__ = [
+    "ChangeRoleRequest",
     "UserRegister",
     "UserLogin",
     "TokenResponse",

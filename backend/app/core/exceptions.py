@@ -17,3 +17,11 @@ class InvalidCredentialsError(DomainException):
 
 class InvalidRefreshTokenError(DomainException):
     """Токен обновления не существует, отозван или истёк."""
+
+
+class UserNotFoundError(DomainException):
+    """Пользователь не найден."""
+
+
+class BlockchainCommunicationError(DomainException):
+    """Сбой при отправке транзакции в блокчейн-сеть."""

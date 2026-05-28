@@ -47,8 +47,21 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
 
-    # Локальная PoA-нода (docker-compose: node1 → localhost:8541)
+    # 1. Локальная PoA-нода (docker-compose: node1 → localhost:8541)
     blockchain_url: str = "http://127.0.0.1:8541"
+    # 2. Приватный ключ validator_1 из файла generated_keys.json. (но так-то данные автоматически из infra/.env подтягиваются)
+    # Бэкенд будет использовать его, чтобы от лица Админа раздавать роли в блокчейне
+    # Важно: поле написано в UPPER_CASE специально, чтобы соответствовать требованию архитектуры и .env.
+    # В коде используйте `settings.BLOCKCHAIN_ADMIN_PRIVATE_KEY`.
+    BLOCKCHAIN_ADMIN_PRIVATE_KEY: str = (
+        "7934413e25edc5a05ae9da5a2d87dede206084f46fb18e7ffecabcd5597bc389"
+    )
+
+    # Backward-compat (если где-то уже использовали нижнее имя)
+    @property
+    def blockchain_admin_private_key(self) -> str:
+        return self.BLOCKCHAIN_ADMIN_PRIVATE_KEY
+
 
     def _credentials(self) -> str:
         """Возвращает URL-строку для подключения к БД"""

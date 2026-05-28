@@ -10,6 +10,8 @@ from app.core.exceptions import (
     InvalidCredentialsError,
     InvalidRefreshTokenError,
     UserAlreadyExistsError,
+    UserNotFoundError,
+    BlockchainCommunicationError
 )
 
 
@@ -32,6 +34,16 @@ async def domain_exception_handler(
         return JSONResponse(
             status_code=401,
             content={"detail": "Invalid, expired or revoked refresh token"},
+        )
+    if isinstance(exc, UserNotFoundError):
+        return JSONResponse(
+            status_code=404,
+            content={"detail": "User not found"},
+        )
+    if isinstance(exc, BlockchainCommunicationError):
+        return JSONResponse(
+            status_code=503,
+            content={"detail": "The blockchain node is temporarily unavailable"}
         )
 
     # Любая другая ошибка домена

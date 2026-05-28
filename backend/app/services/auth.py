@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 from datetime import UTC, datetime, timedelta
 from typing import TypedDict
 
@@ -12,12 +13,14 @@ from eth_account import Account
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.blockchain import blockchain_service
 from app.core.config import settings
 from app.core.crypto import encrypt_key 
 from app.core.exceptions import (
   InvalidCredentialsError,
   InvalidRefreshTokenError,
   UserAlreadyExistsError,
+  BlockchainCommunicationError
 )
 from app.core.security import (
   create_access_token,
@@ -33,6 +36,8 @@ from app.schemas.auth import UserLogin, UserRegister
 class TokenPair(TypedDict):
   access_token: str
   refresh_token: str
+
+logger = logging.getLogger(__name__)
 
 
 def _hash_refresh_token(token: str) -> str:
@@ -73,8 +78,23 @@ async def register_user(db: AsyncSession, schema: UserRegister) -> tuple[User, s
     role=UserRole.STUDENT,
   )
   db.add(user)
-  await db.commit()
-  await db.refresh(user)
+  # await db.commit()
+  # await db.refresh(user)
+  try:
+    # Отправляем транзакцию в сеть localPoA
+    # Важно: USER_ROLE существует только в AuctionManager, поэтому сервис блокчейна
+    # сам корректно синхронизирует роли по всем контрактам.
+    await blockchain_service.sync_roles_for_user(user.wallet_address, target="user")
+    
+    # Только если блокчейн ответил успехом — фиксируем изменения в PostgreSQL
+    await db.commit()
+    await db.refresh(user)
+  except Exception as blockchain_error:
+    # Если нода недоступна или транзакция отклонена
+    await db.rollback() # Отменяем запись в БД
+    logger.exception("On-chain role sync failed during user registration")
+    raise BlockchainCommunicationError() from blockchain_error
+
   return user, raw_private_key
 
 
