@@ -30,6 +30,11 @@ class Project(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, server_default="true")
     
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
 
     # ORM Связи (Relationships)
     users: Mapped[list[UserProject]] = relationship("UserProject", back_populates="project", cascade="all, delete-orphan")

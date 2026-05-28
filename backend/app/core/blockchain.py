@@ -256,16 +256,94 @@ class BlockchainService:
             return
         raise ValueError(f"Unknown role target: {target}")
 
-    async def mint_tokens(self, wallet_address: str, amount_wei: int) -> str:
-        """Заглушка: token.mint от лица админа."""
-        raise NotImplementedError
+    async def _send_signed_tx(self, private_key: str, func: Any) -> str:
+        """
+        Строит и отправляет транзакцию от лица произвольного кошелька (организатор).
 
-    async def create_project_onchain(self, owner_private_key: str, name: str) -> str:
-        """Заглушка: registry.createProject от лица преподавателя."""
-        raise NotImplementedError
+        Используется для createProject, где msg.sender должен быть владельцем ORGANIZER_ROLE.
+        """
+
+        def _sync_send() -> str:
+            account = Account.from_key(private_key)
+            sender = Web3.to_checksum_address(account.address)
+            nonce = self.w3.eth.get_transaction_count(sender, block_identifier="pending")
+            chain_id = int(self.w3.eth.chain_id)
+
+            tx: dict[str, Any] = func.build_transaction(
+                {
+                    "from": sender,
+                    "nonce": nonce,
+                    "gasPrice": 0,
+                    "chainId": chain_id,
+                    "value": 0,
+                }
+            )
+            if "gas" not in tx:
+                tx["gas"] = int(func.estimate_gas({"from": sender}))
+
+            signed = self.w3.eth.account.sign_transaction(tx, private_key=private_key)
+            tx_hash = self.w3.eth.send_raw_transaction(signed.rawTransaction)
+            return tx_hash.hex()
+
+        async with self._tx_lock:
+            return await asyncio.to_thread(_sync_send)
+
+    async def create_project_onchain(
+        self,
+        owner_private_key: str,
+        name: str,
+        refund_rate_bps: int,
+        penalty_schedule: list[int],
+    ) -> tuple[int, str]:
+        """
+        Создаёт проект в ProjectRegistry от лица организатора.
+
+        Возвращает (blockchain_id, tx_hash).
+        """
+        if len(penalty_schedule) != 4:
+            raise ValueError("penalty_schedule must contain exactly 4 values")
+
+        penalty_tuple = tuple(int(x) for x in penalty_schedule)
+        func = self.registry_contract.functions.createProject(
+            name,
+            int(refund_rate_bps),
+            penalty_tuple,
+        )
+        tx_hash = await self._send_signed_tx(owner_private_key, func)
+
+        def _parse_project_id() -> int:
+            receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+            if receipt.get("status") != 1:
+                raise ValueError(f"createProject transaction reverted: {tx_hash}")
+
+            logs = self.registry_contract.events.ProjectCreated().process_receipt(receipt)
+            if not logs:
+                raise ValueError(f"ProjectCreated event not found in receipt: {tx_hash}")
+            return int(logs[0]["args"]["projectId"])
+
+        blockchain_id = await asyncio.to_thread(_parse_project_id)
+        return blockchain_id, tx_hash
+
+    async def mint_tokens(
+        self,
+        wallet_address: str,
+        blockchain_id: int,
+        amount: int,
+    ) -> str:
+        """
+        Минтит ERC-1155 токены проекта студенту от лица DEFAULT_ADMIN_ROLE (бэкенд-админ).
+        """
+        to_addr = Web3.to_checksum_address(wallet_address)
+        func = self.token_contract.functions.mint(
+            to_addr,
+            int(blockchain_id),
+            int(amount),
+            b"",
+        )
+        return await self._send_admin_tx(func)
 
     def get_project_info(self, project_id: int) -> dict[str, Any]:
-        """Заглушка: синхронный .call() к контракту за данными проекта."""
+        """Синхронный .call() к контракту за данными проекта (для будущих фич)."""
         raise NotImplementedError
 
 

@@ -1,4 +1,11 @@
 from app.schemas.admin import ChangeRoleRequest
+from app.schemas.project import (
+    EnrollResponse,
+    ProjectCreate,
+    ProjectCreatedResponse,
+    ProjectDetailResponse,
+    ProjectListResponse,
+)
 from app.schemas.auth import (
     RefreshTokenRequest,
     TokenResponse,
@@ -11,6 +18,11 @@ from app.schemas.auth import (
 
 __all__ = [
     "ChangeRoleRequest",
+    "ProjectCreate",
+    "ProjectListResponse",
+    "ProjectDetailResponse",
+    "ProjectCreatedResponse",
+    "EnrollResponse",
     "UserRegister",
     "UserLogin",
     "TokenResponse",

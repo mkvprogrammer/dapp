@@ -25,3 +25,27 @@ class UserNotFoundError(DomainException):
 
 class BlockchainCommunicationError(DomainException):
     """Сбой при отправке транзакции в блокчейн-сеть."""
+
+
+class ProjectNotFoundError(DomainException):
+    """Проект с таким ID не найден."""
+
+
+class AlreadyEnrolledError(DomainException):
+    """Студент уже записан на этот проект."""
+
+
+class ProjectInactiveError(DomainException):
+    """Проект заморожен или неактивен."""
+
+
+class DatabasePersistenceError(DomainException):
+    """Не удалось сохранить или обновить данные в PostgreSQL."""
+
+
+class OrganizerWalletNotConfiguredError(DomainException):
+    """У организатора не настроен зашифрованный приватный ключ кошелька."""
+
+
+class InvalidWalletPasswordError(DomainException):
+    """Неверный пароль для расшифровки приватного ключа кошелька."""
