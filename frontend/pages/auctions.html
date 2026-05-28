@@ -1,0 +1,243 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Аукционы — AuctionChain</title>
+    <link rel="stylesheet" href="../css/normalize.css" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/auctions.css" />
+  </head>
+  <body>
+    <div class="AppLayout AuctionsPage">
+      <aside class="AppSidebar">
+        <a href="home.html" class="AppSidebar__brand">
+          <img class="AppSidebar__logo" src="../assets/images/logo.png" alt="" width="40" height="40" />
+          <div class="AppSidebar__brand-text">
+            <p class="AppSidebar__brand-name">AuctionChain</p>
+            <p class="AppSidebar__brand-tagline">Честное распределение ресурсов</p>
+          </div>
+        </a>
+        <nav>
+          <ul class="AppSidebar__nav">
+            <li><a class="AppSidebar__link" href="home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/></svg>Главная</a></li>
+            <li><a class="AppSidebar__link" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.1-7 7-7s7 3 7 7"/></svg>Личный кабинет</a></li>
+            <li><a class="AppSidebar__link" href="projects.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Мои проекты</a></li>
+            <li><a class="AppSidebar__link AppSidebar__link--active" href="auctions.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M10 20H4v-6M20 4l-8 8M4 20l8-8"/></svg>Аукционы</a></li>
+            <li><a class="AppSidebar__link" href="transfers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>Переводы токенов</a></li>
+            <li><a class="AppSidebar__link" href="organizer.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>Организатору</a></li>
+            <li><a class="AppSidebar__link" href="create-auction.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>Создать аукцион</a></li>
+          </ul>
+        </nav>
+        <div class="AppSidebar__help">
+          <p class="AppSidebar__help-title">Нужна помощь?</p>
+          <p class="AppSidebar__help-text">Ознакомьтесь с документацией платформы</p>
+          <a href="#" class="Btn Btn--secondary Btn--sm Btn--block">Документация</a>
+        </div>
+        <p class="AppSidebar__footer">&copy; 2026 AuctionChain<br />v0.1.0</p>
+      </aside>
+
+      <div class="AppLayout__main">
+        <header class="AppTopbar">
+          <a href="notifications.html" class="AppTopbar__notify" aria-label="Уведомления">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span class="AppTopbar__notify-badge"></span>
+          </a>
+          <button type="button" class="AppTopbar__user">
+            <span class="Avatar Avatar--sm">ИИ</span>
+            <span>
+              <strong style="display:block;font-size:0.875rem">Иван Иванов</strong>
+              <span style="font-size:0.75rem;color:var(--color-text-muted)">itmo_id: 123456</span>
+            </span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </header>
+
+        <main class="AppLayout__content">
+          <header class="PageHeader PageHeader__row">
+            <div>
+              <h1 class="PageHeader__title">Аукционы</h1>
+              <p class="PageHeader__subtitle">Маркетплейс учебных ресурсов: консультации, аудитории, оборудование и дополнительные занятия.</p>
+            </div>
+            <a href="create-auction.html" class="Btn Btn--primary">+ Создать аукцион</a>
+          </header>
+
+          <div class="Toolbar">
+            <div class="Toolbar__search">
+              <input type="search" class="Input" placeholder="Поиск по названию, проекту или типу…" />
+            </div>
+          </div>
+
+          <div class="AuctionsPage__filters">
+            <select class="Select">
+              <option>Все проекты</option>
+              <option>Математика</option>
+              <option>Физика</option>
+              <option>Программирование</option>
+              <option>Химия</option>
+            </select>
+            <select class="Select">
+              <option>Любой тип</option>
+              <option>Консультация</option>
+              <option>Лекция</option>
+              <option>Аудитория</option>
+              <option>Оборудование</option>
+            </select>
+            <select class="Select">
+              <option>Любая ставка</option>
+              <option>До 5 TKN</option>
+              <option>5–15 TKN</option>
+              <option>Более 15 TKN</option>
+            </select>
+          </div>
+
+          <div class="Tabs" style="margin-bottom:24px">
+            <a href="#" class="Tabs__item Tabs__item--active">Активные</a>
+            <a href="#" class="Tabs__item">Предстоящие</a>
+            <a href="#" class="Tabs__item">Завершённые</a>
+          </div>
+
+          <div class="AuctionsPage__layout">
+            <div class="AuctionsPage__grid">
+              <a href="auction-details.html" class="AuctionCard">
+                <img
+                  class="AuctionCard__banner"
+                  src="../assets/images/auction-math-consultation.png"
+                  alt=""
+                />
+                <div class="AuctionCard__body">
+                  <span class="Badge Badge--primary"><span class="LiveDot"></span> Идёт сейчас</span>
+                  <h2 class="AuctionCard__title">Запись на консультацию по математике</h2>
+                  <div class="AuctionCard__meta">
+                    <span class="Tag">Математика</span>
+                    <span>Ставка: <strong>12.50 TKN</strong></span>
+                    <span>⏱ <strong>2ч 15м</strong></span>
+                  </div>
+                  <div class="AuctionCard__footer">
+                    <span>24 участника</span>
+                    <span class="Btn Btn--ghost Btn--sm">Участвовать</span>
+                  </div>
+                </div>
+              </a>
+
+              <a href="auction-details.html" class="AuctionCard">
+                <img
+                  class="AuctionCard__banner"
+                  src="../assets/images/auction-smart-space.png"
+                  alt=""
+                />
+                <div class="AuctionCard__body">
+                  <span class="Badge Badge--success">Активен</span>
+                  <h2 class="AuctionCard__title">Бронь переговорной Smart Space</h2>
+                  <div class="AuctionCard__meta">
+                    <span class="Tag">Программирование</span>
+                    <span>Ставка: <strong>8.00 TKN</strong></span>
+                    <span>⏱ <strong>1д 4ч</strong></span>
+                  </div>
+                  <div class="AuctionCard__footer">
+                    <span>18 участников</span>
+                    <span class="Btn Btn--ghost Btn--sm">Участвовать</span>
+                  </div>
+                </div>
+              </a>
+
+              <a href="auction-details.html" class="AuctionCard">
+                <img
+                  class="AuctionCard__banner"
+                  src="../assets/images/auction-physics-lab.png"
+                  alt=""
+                />
+                <div class="AuctionCard__body">
+                  <span class="Badge Badge--success">Активен</span>
+                  <h2 class="AuctionCard__title">Лабораторная работа по физике</h2>
+                  <div class="AuctionCard__meta">
+                    <span class="Tag">Физика</span>
+                    <span>Ставка: <strong>6.50 TKN</strong></span>
+                    <span>⏱ <strong>2д 8ч</strong></span>
+                  </div>
+                  <div class="AuctionCard__footer">
+                    <span>32 участника</span>
+                    <span class="Btn Btn--ghost Btn--sm">Участвовать</span>
+                  </div>
+                </div>
+              </a>
+
+              <a href="auction-details.html" class="AuctionCard">
+                <img
+                  class="AuctionCard__banner"
+                  src="../assets/images/auction-3d-printer.png"
+                  alt=""
+                />
+                <div class="AuctionCard__body">
+                  <span class="Badge Badge--warning">Заканчивается</span>
+                  <h2 class="AuctionCard__title">Аренда 3D-принтера на 2 часа</h2>
+                  <div class="AuctionCard__meta">
+                    <span class="Tag">Химия</span>
+                    <span>Ставка: <strong>20.00 TKN</strong></span>
+                    <span>⏱ <strong>45м</strong></span>
+                  </div>
+                  <div class="AuctionCard__footer">
+                    <span>8 участников</span>
+                    <span class="Btn Btn--ghost Btn--sm">Участвовать</span>
+                  </div>
+                </div>
+              </a>
+
+              <a href="auction-details.html" class="AuctionCard">
+                <img
+                  class="AuctionCard__banner"
+                  src="../assets/images/auction-algorithms-seminar.png"
+                  alt=""
+                />
+                <div class="AuctionCard__body">
+                  <span class="Badge Badge--success">Активен</span>
+                  <h2 class="AuctionCard__title">Дополнительный семинар по алгоритмам</h2>
+                  <div class="AuctionCard__meta">
+                    <span class="Tag">Программирование</span>
+                    <span>Ставка: <strong>10.00 TKN</strong></span>
+                    <span>⏱ <strong>4д 2ч</strong></span>
+                  </div>
+                  <div class="AuctionCard__footer">
+                    <span>56 участников</span>
+                    <span class="Btn Btn--ghost Btn--sm">Участвовать</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <aside>
+              <section class="Card" style="margin-bottom:20px">
+                <div class="Card__header"><h2 class="Card__title">Календарь аукционов</h2></div>
+                <div class="Card__body Card__body--flush-top">
+                  <div class="AuctionsPage__calendar">
+                    <span class="AuctionsPage__calendar-icon">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    </span>
+                    <p style="margin:0;font-weight:600">Май 2026</p>
+                    <p style="margin:0">5 активных · 3 предстоящих</p>
+                    <p style="margin:0;font-size:0.75rem">Интерактивный календарь скоро</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="AuctionsPage__tutorial">
+                <h3 class="AuctionsPage__tutorial-title">Как участвовать в аукционах?</h3>
+                <p class="AuctionsPage__tutorial-text">1. Выберите аукцион и изучите правила.<br />2. Сделайте ставку — токены замораживаются.<br />3. Следите за рейтингом в реальном времени.<br />4. При победе получите ресурс, при проигрыше — частичный возврат.</p>
+                <a href="#" class="Btn Btn--secondary Btn--sm">Подробное руководство</a>
+              </section>
+            </aside>
+          </div>
+        </main>
+      </div>
+
+      <nav class="AppMobileNav" aria-label="Мобильная навигация">
+        <a class="AppMobileNav__link" href="home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/></svg>Главная</a>
+        <a class="AppMobileNav__link" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.1-7 7-7s7 3 7 7"/></svg>Профиль</a>
+        <a class="AppMobileNav__link AppMobileNav__link--active" href="auctions.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M10 20H4v-6M20 4l-8 8M4 20l8-8"/></svg>Аукционы</a>
+        <a class="AppMobileNav__link" href="projects.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Проекты</a>
+        <a class="AppMobileNav__link" href="notifications.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>Ещё</a>
+      </nav>
+    </div>
+  </body>
+</html>

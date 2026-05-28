@@ -1,0 +1,229 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Уведомления — AuctionChain</title>
+    <link rel="stylesheet" href="../css/normalize.css" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/notifications.css" />
+  </head>
+  <body>
+    <div class="AppLayout NotificationsPage">
+      <aside class="AppSidebar">
+        <a href="home.html" class="AppSidebar__brand">
+          <img class="AppSidebar__logo" src="../assets/images/logo.png" alt="" width="40" height="40" />
+          <div class="AppSidebar__brand-text">
+            <p class="AppSidebar__brand-name">AuctionChain</p>
+            <p class="AppSidebar__brand-tagline">Честное распределение ресурсов</p>
+          </div>
+        </a>
+        <nav>
+          <ul class="AppSidebar__nav">
+            <li><a class="AppSidebar__link" href="home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/></svg>Главная</a></li>
+            <li><a class="AppSidebar__link" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.1-7 7-7s7 3 7 7"/></svg>Личный кабинет</a></li>
+            <li><a class="AppSidebar__link" href="projects.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Мои проекты</a></li>
+            <li><a class="AppSidebar__link" href="auctions.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M10 20H4v-6M20 4l-8 8M4 20l8-8"/></svg>Аукционы</a></li>
+            <li><a class="AppSidebar__link" href="transfers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>Переводы токенов</a></li>
+            <li><a class="AppSidebar__link" href="organizer.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>Организатору</a></li>
+            <li><a class="AppSidebar__link" href="create-auction.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>Создать аукцион</a></li>
+          </ul>
+        </nav>
+        <div class="AppSidebar__help">
+          <p class="AppSidebar__help-title">Нужна помощь?</p>
+          <p class="AppSidebar__help-text">Ознакомьтесь с документацией платформы</p>
+          <a href="#" class="Btn Btn--secondary Btn--sm Btn--block">Документация</a>
+        </div>
+        <p class="AppSidebar__footer">&copy; 2026 AuctionChain<br />v0.1.0</p>
+      </aside>
+
+      <div class="AppLayout__main">
+        <header class="AppTopbar">
+          <a href="notifications.html" class="AppTopbar__notify" aria-label="Уведомления">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span class="AppTopbar__notify-badge"></span>
+          </a>
+          <button type="button" class="AppTopbar__user">
+            <span class="Avatar Avatar--sm">ИИ</span>
+            <span>
+              <strong style="display:block;font-size:0.875rem">Иван Иванов</strong>
+              <span style="font-size:0.75rem;color:var(--color-text-muted)">itmo_id: 123456</span>
+            </span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </header>
+
+        <main class="AppLayout__content">
+          <header class="PageHeader PageHeader__row">
+            <div>
+              <h1 class="PageHeader__title">Уведомления</h1>
+              <p class="PageHeader__subtitle">3 непрочитанных уведомления</p>
+            </div>
+            <button type="button" class="Btn Btn--ghost NotificationsPage__mark-all">Отметить все прочитанными</button>
+          </header>
+
+          <div class="NotificationsPage__toolbar">
+            <div class="Tabs NotificationsPage__filters">
+              <a href="#" class="Tabs__item Tabs__item--active">Все</a>
+              <a href="#" class="Tabs__item">Аукционы</a>
+              <a href="#" class="Tabs__item">Переводы</a>
+              <a href="#" class="Tabs__item">Посещения</a>
+              <a href="#" class="Tabs__item">Организатор</a>
+            </div>
+          </div>
+
+          <div class="NotificationsPage__list">
+            <article class="NotificationCard NotificationCard--auction NotificationCard--unread">
+              <span class="NotificationCard__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M10 20H4v-6M20 4l-8 8M4 20l8-8"/></svg>
+              </span>
+              <div class="NotificationCard__body">
+                <h2 class="NotificationCard__title">Ваша ставка перебита</h2>
+                <p class="NotificationCard__text">Андрей Кузнецов повысил ставку до 18.50 TKN в аукционе «Запись на консультацию по математике». Ваше текущее место — 7 из 24.</p>
+                <div class="NotificationCard__meta">
+                  <span class="Tag">Математика</span>
+                  <span>Ставка: 12.50 TKN</span>
+                </div>
+              </div>
+              <div class="NotificationCard__actions">
+                <span class="NotificationCard__time">2 мин назад</span>
+                <a href="auction-details.html" class="Btn Btn--ghost Btn--sm">К аукциону</a>
+              </div>
+            </article>
+
+            <article class="NotificationCard NotificationCard--auction NotificationCard--unread">
+              <span class="NotificationCard__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3M12 22a10 10 0 100-20 10 10 0 000 20z"/></svg>
+              </span>
+              <div class="NotificationCard__body">
+                <h2 class="NotificationCard__title">Аукцион скоро завершится</h2>
+                <p class="NotificationCard__text">До окончания аукциона «Запись на консультацию по математике» осталось менее 3 часов. Проверьте своё место в рейтинге.</p>
+                <div class="NotificationCard__meta">
+                  <span class="Tag">Математика</span>
+                  <span>Осталось: 2ч 15м</span>
+                </div>
+              </div>
+              <div class="NotificationCard__actions">
+                <span class="NotificationCard__time">15 мин назад</span>
+                <a href="auction-details.html" class="Btn Btn--ghost Btn--sm">К аукциону</a>
+              </div>
+            </article>
+
+            <article class="NotificationCard NotificationCard--transfer NotificationCard--unread">
+              <span class="NotificationCard__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 10h10M12 5v14"/></svg>
+              </span>
+              <div class="NotificationCard__body">
+                <h2 class="NotificationCard__title">Перевод выполнен</h2>
+                <p class="NotificationCard__text">Вы перевели 10.00 TKN пользователю Мария Петрова в проекте «Математика». Комментарий: «За помощь с домашним заданием по интегралам».</p>
+                <div class="NotificationCard__meta">
+                  <span>Баланс: 32.50 TKN</span>
+                </div>
+              </div>
+              <div class="NotificationCard__actions">
+                <span class="NotificationCard__time">28 мая, 14:12</span>
+                <a href="transfers.html" class="Btn Btn--ghost Btn--sm">История</a>
+              </div>
+            </article>
+
+            <article class="NotificationCard NotificationCard--attendance">
+              <span class="NotificationCard__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+              </span>
+              <div class="NotificationCard__body">
+                <h2 class="NotificationCard__title">Посещение подтверждено</h2>
+                <p class="NotificationCard__text">Вам начислено 5.00 TKN за посещение лекции «Математический анализ» в проекте «Программирование».</p>
+                <div class="NotificationCard__meta">
+                  <span class="Tag">Программирование</span>
+                  <span>+5.00 TKN</span>
+                </div>
+              </div>
+              <div class="NotificationCard__actions">
+                <span class="NotificationCard__time">27 мая, 18:30</span>
+                <a href="profile.html" class="Btn Btn--ghost Btn--sm">Профиль</a>
+              </div>
+            </article>
+
+            <article class="NotificationCard NotificationCard--organizer">
+              <span class="NotificationCard__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6"/></svg>
+              </span>
+              <div class="NotificationCard__body">
+                <h2 class="NotificationCard__title">Новый участник в проекте</h2>
+                <p class="NotificationCard__text">Елена Волкова присоединилась к проекту «Математика». Всего участников: 128.</p>
+                <div class="NotificationCard__meta">
+                  <span>itmo_id: 567890</span>
+                </div>
+              </div>
+              <div class="NotificationCard__actions">
+                <span class="NotificationCard__time">26 мая, 10:00</span>
+                <a href="organizer.html" class="Btn Btn--ghost Btn--sm">Панель</a>
+              </div>
+            </article>
+
+            <article class="NotificationCard NotificationCard--auction">
+              <span class="NotificationCard__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10l1 7H6L7 4z"/></svg>
+              </span>
+              <div class="NotificationCard__body">
+                <h2 class="NotificationCard__title">Вы выиграли аукцион!</h2>
+                <p class="NotificationCard__text">Поздравляем! Вы заняли 3-е место в аукционе «Бронь переговорной Smart Space». Ставка 8.00 TKN списана с баланса.</p>
+                <div class="NotificationCard__meta">
+                  <span class="Tag">Программирование</span>
+                  <span>30 мая, 16:00</span>
+                </div>
+              </div>
+              <div class="NotificationCard__actions">
+                <span class="NotificationCard__time">25 мая, 20:00</span>
+                <a href="auction-details.html" class="Btn Btn--ghost Btn--sm">Подробнее</a>
+              </div>
+            </article>
+
+            <article class="NotificationCard NotificationCard--transfer">
+              <span class="NotificationCard__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </span>
+              <div class="NotificationCard__body">
+                <h2 class="NotificationCard__title">Входящий перевод</h2>
+                <p class="NotificationCard__text">Дмитрий Соколов перевёл вам 15.00 TKN в проекте «Программирование». Комментарий: «Оплата за ревью кода».</p>
+                <div class="NotificationCard__meta">
+                  <span>+15.00 TKN</span>
+                </div>
+              </div>
+              <div class="NotificationCard__actions">
+                <span class="NotificationCard__time">25 мая, 09:30</span>
+                <a href="transfers.html" class="Btn Btn--ghost Btn--sm">История</a>
+              </div>
+            </article>
+
+            <article class="NotificationCard NotificationCard--organizer">
+              <span class="NotificationCard__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg>
+              </span>
+              <div class="NotificationCard__body">
+                <h2 class="NotificationCard__title">Код посещения истекает</h2>
+                <p class="NotificationCard__text">Код MATH-7K2P для лекции «Математический анализ» истекает через 30 минут. Сгенерируйте новый код при необходимости.</p>
+                <div class="NotificationCard__meta">
+                  <span>Организатор · Математика</span>
+                </div>
+              </div>
+              <div class="NotificationCard__actions">
+                <span class="NotificationCard__time">24 мая, 15:00</span>
+                <a href="organizer.html" class="Btn Btn--ghost Btn--sm">Панель</a>
+              </div>
+            </article>
+          </div>
+        </main>
+      </div>
+
+      <nav class="AppMobileNav" aria-label="Мобильная навигация">
+        <a class="AppMobileNav__link" href="home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/></svg>Главная</a>
+        <a class="AppMobileNav__link" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.1-7 7-7s7 3 7 7"/></svg>Профиль</a>
+        <a class="AppMobileNav__link" href="auctions.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M10 20H4v-6M20 4l-8 8M4 20l8-8"/></svg>Аукционы</a>
+        <a class="AppMobileNav__link" href="projects.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Проекты</a>
+        <a class="AppMobileNav__link AppMobileNav__link--active" href="notifications.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>Ещё</a>
+      </nav>
+    </div>
+  </body>
+</html>

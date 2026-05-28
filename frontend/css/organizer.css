@@ -1,0 +1,112 @@
+/* —— Organizer dashboard —— */
+
+.OrganizerPage__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.OrganizerPage__stat {
+  padding: 20px 24px;
+}
+
+.OrganizerPage__stat-value {
+  margin: 0 0 4px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.OrganizerPage__stat-label {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.OrganizerPage__stat-trend {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  color: var(--color-success);
+}
+
+.OrganizerPage__charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.OrganizerPage__chart-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  height: 160px;
+  padding: 16px 0 0;
+}
+
+.OrganizerPage__chart-bar {
+  flex: 1;
+  min-width: 0;
+  background: linear-gradient(to top, var(--color-primary), #a78bfa);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  opacity: 0.85;
+}
+
+.OrganizerPage__chart-bar-label {
+  margin-top: 8px;
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.OrganizerPage__chart-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.OrganizerPage__actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.OrganizerPage__attendance-code {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--color-success-bg);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  border-radius: var(--radius-md);
+}
+
+.OrganizerPage__code-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: monospace;
+  letter-spacing: 0.15em;
+  color: var(--color-success);
+}
+
+@media (max-width: 1100px) {
+  .OrganizerPage__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .OrganizerPage__charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .OrganizerPage__stats {
+    grid-template-columns: 1fr;
+  }
+}

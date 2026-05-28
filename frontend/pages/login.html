@@ -1,0 +1,192 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Вход — AuctionChain</title>
+    <link rel="stylesheet" href="../css/normalize.css" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/login.css" />
+  </head>
+  <body>
+    <div class="LoginPage">
+      <div class="LoginPage__content">
+        <aside class="LoginPage__aside">
+          <header class="LoginPage__brand">
+            <img
+              class="LoginPage__logo"
+              src="../assets/images/logo.png"
+              alt=""
+              width="56"
+              height="56"
+            />
+            <div class="LoginPage__brand-text">
+              <h1 class="LoginPage__brand-name">AuctionChain</h1>
+              <p class="LoginPage__brand-tagline">Честное распределение ресурсов</p>
+            </div>
+          </header>
+
+          <div class="LoginPage__intro">
+            <h2 class="LoginPage__title">
+              С возвращением в
+              <span class="LoginPage__title-accent">AuctionChain</span>
+            </h2>
+            <p class="LoginPage__description">
+              Платформа для честного распределения ограниченных ресурсов с помощью
+              аукционов и токенов.
+            </p>
+          </div>
+
+          <div class="LoginPage__illustration" aria-hidden="true">
+            <img
+              src="../assets/images/login-illustration.png"
+              alt=""
+              class="LoginPage__illustration-img"
+              width="480"
+              height="360"
+            />
+          </div>
+
+          <ul class="LoginPage__features">
+            <li class="LoginPage__feature">
+              <span class="LoginPage__feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3L4 7v5c0 5 3.5 9 8 10 4.5-1 8-5 8-10V7l-8-4z" />
+                  <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              Честные аукционы
+            </li>
+            <li class="LoginPage__feature">
+              <span class="LoginPage__feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <ellipse cx="12" cy="6" rx="8" ry="3" />
+                  <path d="M4 6v4c0 1.7 3.6 3 8 3s8-1.3 8-3V6" />
+                  <path d="M4 14v4c0 1.7 3.6 3 8 3s8-1.3 8-3v-4" />
+                </svg>
+              </span>
+              Токены за активность
+            </li>
+            <li class="LoginPage__feature">
+              <span class="LoginPage__feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="9" cy="8" r="3" />
+                  <circle cx="17" cy="10" r="2.5" />
+                  <path d="M3 20c0-3 2.7-5 6-5s6 2 6 5" stroke-linecap="round" />
+                  <path d="M15 20c0-2 1.5-3.5 4-3.5" stroke-linecap="round" />
+                </svg>
+              </span>
+              Прозрачные правила
+            </li>
+          </ul>
+        </aside>
+
+        <main class="LoginPage__main">
+          <div class="LoginPage__card">
+            <header class="LoginPage__card-header">
+              <h2 class="LoginPage__card-title">Вход</h2>
+              <p class="LoginPage__card-subtitle">Введите данные для входа в аккаунт</p>
+            </header>
+
+            <form class="LoginForm" action="#" method="post" novalidate>
+              <div class="LoginForm__field">
+                <label class="LoginForm__label" for="itmoId">ITMO ID</label>
+                <div class="LoginForm__input-wrap">
+                  <span class="LoginForm__input-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="5" width="18" height="14" rx="2" />
+                      <circle cx="9" cy="12" r="2" />
+                      <path d="M15 10h4M15 14h4" stroke-linecap="round" />
+                    </svg>
+                  </span>
+                  <input
+                    class="LoginForm__input"
+                    type="text"
+                    id="itmoId"
+                    name="itmoId"
+                    placeholder="Введите ваш ITMO ID"
+                    autocomplete="username"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="LoginForm__field">
+                <label class="LoginForm__label" for="password">Пароль</label>
+                <div class="LoginForm__input-wrap">
+                  <span class="LoginForm__input-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="5" y="11" width="14" height="10" rx="2" />
+                      <path d="M8 11V8a4 4 0 018 0v3" stroke-linecap="round" />
+                    </svg>
+                  </span>
+                  <input
+                    class="LoginForm__input"
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Введите пароль"
+                    autocomplete="current-password"
+                    data-password-input
+                    required
+                  />
+                  <button
+                    class="LoginForm__toggle-password"
+                    type="button"
+                    data-password-toggle
+                    aria-label="Показать пароль"
+                    aria-pressed="false"
+                  >
+                    <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" hidden>
+                      <path d="M17.94 17.94A10.07 10.07 0 0112 19c-7 0-10-7-10-7a18.45 18.45 0 015.06-5.94" />
+                      <path d="M9.9 4.24A9.12 9.12 0 0112 5c7 0 10 7 10 7a18.5 18.5 0 01-2.16 3.19" />
+                      <path d="M14.12 14.12a3 3 0 01-4.24-4.24" />
+                      <line x1="2" y1="2" x2="22" y2="22" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <button class="LoginForm__submit" type="submit">Войти</button>
+            </form>
+
+            <div class="LoginPage__divider" role="separator">или</div>
+
+            <p class="LoginPage__register-prompt">
+              Нет аккаунта?
+              <a class="LoginPage__register-link" href="registration.html">Зарегистрироваться</a>
+            </p>
+          </div>
+        </main>
+      </div>
+
+      <footer class="LoginPage__site-footer">
+        <p>&copy; 2026 AuctionChain</p>
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        document.querySelectorAll('[data-password-toggle]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var wrap = btn.closest('.LoginForm__input-wrap');
+            var input = wrap.querySelector('[data-password-input]');
+            var eye = btn.querySelector('.icon-eye');
+            var eyeOff = btn.querySelector('.icon-eye-off');
+            var visible = input.type === 'text';
+
+            input.type = visible ? 'password' : 'text';
+            btn.setAttribute('aria-pressed', String(!visible));
+            btn.setAttribute('aria-label', visible ? 'Показать пароль' : 'Скрыть пароль');
+            eye.hidden = !visible;
+            eyeOff.hidden = visible;
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
