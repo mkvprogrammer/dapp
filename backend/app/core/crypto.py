@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 from app.core.exceptions import (
     InvalidWalletPasswordError,
-    OrganizerWalletNotConfiguredError,
+    WalletKeyNotConfiguredError,
 )
 
 def _derive_key(password: str) -> bytes:
@@ -49,7 +49,7 @@ def decrypt_wallet_private_key(encrypted_key_str: str | None, password: str) -> 
     Используется в HTTP-ручках без try/except: глобальный handler сопоставит статус-код.
     """
     if not encrypted_key_str:
-        raise OrganizerWalletNotConfiguredError()
+        raise WalletKeyNotConfiguredError()
     try:
         return decrypt_key(encrypted_key_str, password)
     except InvalidToken as exc:

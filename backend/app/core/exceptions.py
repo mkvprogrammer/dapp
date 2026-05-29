@@ -43,9 +43,41 @@ class DatabasePersistenceError(DomainException):
     """Не удалось сохранить или обновить данные в PostgreSQL."""
 
 
-class OrganizerWalletNotConfiguredError(DomainException):
-    """У организатора не настроен зашифрованный приватный ключ кошелька."""
+class WalletKeyNotConfiguredError(DomainException):
+    """У пользователя не настроен зашифрованный приватный ключ кошелька."""
+
+
+class OrganizerWalletNotConfiguredError(WalletKeyNotConfiguredError):
+    """Алиас для обратной совместимости (создание проекта организатором)."""
 
 
 class InvalidWalletPasswordError(DomainException):
     """Неверный пароль для расшифровки приватного ключа кошелька."""
+
+
+class AuctionNotFoundError(DomainException):
+    """Аукцион с таким ID не найден в системе."""
+
+
+class AuctionClosedError(DomainException):
+    """Попытка действия на завершённом или отменённом аукционе."""
+
+
+class AuctionTimeError(DomainException):
+    """Некорректные временные рамки аукциона."""
+
+
+class BidNotFoundError(DomainException):
+    """Ставка в запрашиваемом аукционе не найдена."""
+
+
+class InsufficientTokensError(DomainException):
+    """Недостаточно токенов на балансе для ставки."""
+
+
+class NotEnrolledInProjectError(DomainException):
+    """Пользователь не записан на проект и не может создать аукцион."""
+
+
+class ProjectAccessDeniedError(DomainException):
+    """Нет прав на действия с этим проектом."""

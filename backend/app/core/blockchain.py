@@ -258,9 +258,9 @@ class BlockchainService:
 
     async def _send_signed_tx(self, private_key: str, func: Any) -> str:
         """
-        Строит и отправляет транзакцию от лица произвольного кошелька (организатор).
+        Строит и отправляет транзакцию от лица произвольного кошелька (создатель / студент / организатор).
 
-        Используется для createProject, где msg.sender должен быть владельцем ORGANIZER_ROLE.
+        Используется для createProject, createAuction, placeBid и т.д.
         """
 
         def _sync_send() -> str:
@@ -345,6 +345,141 @@ class BlockchainService:
     def get_project_info(self, project_id: int) -> dict[str, Any]:
         """Синхронный .call() к контракту за данными проекта (для будущих фич)."""
         raise NotImplementedError
+
+    async def _ensure_token_approval_for_auction(self, owner_private_key: str) -> str | None:
+        """
+        Проверяет setApprovalForAll для AuctionManager.
+
+        Если одобрения нет — строит, подписывает и отправляет транзакцию approve.
+        Возвращает tx_hash одобрения или None, если уже было одобрено.
+        """
+        account = Account.from_key(owner_private_key)
+        owner = Web3.to_checksum_address(account.address)
+        auction_addr = self.auction_contract.address
+
+        def _is_approved() -> bool:
+            return bool(
+                self.token_contract.functions.isApprovedForAll(owner, auction_addr).call()
+            )
+
+        if await asyncio.to_thread(_is_approved):
+            return None
+
+        # build_transaction → sign_transaction → send_raw_transaction
+        approve_func = self.token_contract.functions.setApprovalForAll(auction_addr, True)
+        return await self._send_signed_tx(owner_private_key, approve_func)
+
+    async def get_token_balance(self, wallet_address: str, project_blockchain_id: int) -> int:
+        """Синхронный balanceOf для ERC-1155 (projectId = token id)."""
+        owner = Web3.to_checksum_address(wallet_address)
+
+        def _call() -> int:
+            return int(
+                self.token_contract.functions.balanceOf(owner, int(project_blockchain_id)).call()
+            )
+
+        return await asyncio.to_thread(_call)
+
+    async def create_auction_onchain(
+        self,
+        project_blockchain_id: int,
+        resource_name: str,
+        duration_seconds: int,
+        lesson_start_ts: int,
+        resource_limit: int,
+        creator_private_key: str,
+    ) -> tuple[int, str]:
+        """
+        createAuction в AuctionManager.
+
+        Подписант (creator_private_key) — любой аккаунт с USER_ROLE или ORGANIZER_ROLE
+        (студент, записанный на курс, или организатор). Не используется ключ админа бэкенда.
+
+        Возвращает (blockchain_auction_id, tx_hash).
+        """
+        func = self.auction_contract.functions.createAuction(
+            int(project_blockchain_id),
+            resource_name,
+            int(duration_seconds),
+            int(lesson_start_ts),
+            int(resource_limit),
+        )
+        tx_hash = await self._send_signed_tx(creator_private_key, func)
+
+        def _parse_auction_id() -> int:
+            receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+            if receipt.get("status") != 1:
+                raise ValueError(f"createAuction reverted: {tx_hash}")
+            logs = self.auction_contract.events.AuctionCreated().process_receipt(receipt)
+            if not logs:
+                raise ValueError(f"AuctionCreated event not found: {tx_hash}")
+            return int(logs[0]["args"]["auctionId"])
+
+        auction_id = await asyncio.to_thread(_parse_auction_id)
+        return auction_id, tx_hash
+
+    async def place_bid_onchain(
+        self,
+        blockchain_auction_id: int,
+        amount: int,
+        student_private_key: str,
+    ) -> str:
+        """
+        Две onchain-операции студента:
+        1) setApprovalForAll (если нужно)
+        2) placeBid(auctionId, amount)
+        """
+        await self._ensure_token_approval_for_auction(student_private_key)
+
+        bid_func = self.auction_contract.functions.placeBid(
+            int(blockchain_auction_id),
+            int(amount),
+        )
+        return await self._send_signed_tx(student_private_key, bid_func)
+
+    async def cancel_bid_onchain(
+        self,
+        blockchain_auction_id: int,
+        student_private_key: str,
+    ) -> str:
+        """cancelBid в AuctionManager от лица студента."""
+        func = self.auction_contract.functions.cancelBid(int(blockchain_auction_id))
+        return await self._send_signed_tx(student_private_key, func)
+
+    async def get_leaderboard(
+        self,
+        blockchain_auction_id: int,
+        limit: int,
+    ) -> list[tuple[str, int]]:
+        """
+        getLeaderboard из контракта: список (address, bid_amount).
+        """
+        def _call() -> list[tuple[str, int]]:
+            users, bids = self.auction_contract.functions.getLeaderboard(
+                int(blockchain_auction_id),
+                int(limit),
+            ).call()
+            return [(Web3.to_checksum_address(u), int(b)) for u, b in zip(users, bids)]
+
+        return await asyncio.to_thread(_call)
+
+    async def is_student_in_guaranteed_top(
+        self,
+        blockchain_auction_id: int,
+        wallet_address: str,
+    ) -> bool:
+        """Синхронный view-вызов isStudentInGuaranteedTop."""
+        addr = Web3.to_checksum_address(wallet_address)
+
+        def _call() -> bool:
+            return bool(
+                self.auction_contract.functions.isStudentInGuaranteedTop(
+                    int(blockchain_auction_id),
+                    addr,
+                ).call()
+            )
+
+        return await asyncio.to_thread(_call)
 
 
 # Singleton-экземпляр (инициализируется один раз)

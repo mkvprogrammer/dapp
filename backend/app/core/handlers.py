@@ -7,13 +7,20 @@ from fastapi.responses import JSONResponse
 
 from app.core.exceptions import (
     AlreadyEnrolledError,
+    AuctionClosedError,
+    AuctionNotFoundError,
+    AuctionTimeError,
     BlockchainCommunicationError,
+    BidNotFoundError,
     DatabasePersistenceError,
     DomainException,
+    InsufficientTokensError,
+    NotEnrolledInProjectError,
+    ProjectAccessDeniedError,
     InvalidCredentialsError,
     InvalidRefreshTokenError,
     InvalidWalletPasswordError,
-    OrganizerWalletNotConfiguredError,
+    WalletKeyNotConfiguredError,
     ProjectInactiveError,
     ProjectNotFoundError,
     UserAlreadyExistsError,
@@ -66,20 +73,55 @@ async def domain_exception_handler(
             status_code=503,
             content={"detail": "Blockchain network node is temporarily unavailable"},
         )
-    if isinstance(exc, OrganizerWalletNotConfiguredError):
+    if isinstance(exc, WalletKeyNotConfiguredError):
         return JSONResponse(
             status_code=400,
-            content={"detail": "Organizer wallet key is not configured"},
+            content={"detail": "Wallet private key is not configured for this account"},
         )
     if isinstance(exc, InvalidWalletPasswordError):
         return JSONResponse(
             status_code=400,
-            content={"detail": "Invalid organizer password for wallet decryption"},
+            content={"detail": "Invalid password for wallet decryption"},
         )
     if isinstance(exc, DatabasePersistenceError):
         return JSONResponse(
             status_code=500,
             content={"detail": "Failed to persist application data"},
+        )
+    if isinstance(exc, AuctionNotFoundError):
+        return JSONResponse(
+            status_code=404,
+            content={"detail": "Auction not found"},
+        )
+    if isinstance(exc, AuctionClosedError):
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "This auction is already closed or cancelled"},
+        )
+    if isinstance(exc, AuctionTimeError):
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "Invalid lesson start time or duration"},
+        )
+    if isinstance(exc, BidNotFoundError):
+        return JSONResponse(
+            status_code=404,
+            content={"detail": "Bid not found"},
+        )
+    if isinstance(exc, InsufficientTokensError):
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "Insufficient university token balance"},
+        )
+    if isinstance(exc, NotEnrolledInProjectError):
+        return JSONResponse(
+            status_code=403,
+            content={"detail": "You must be enrolled in the project to create an auction"},
+        )
+    if isinstance(exc, ProjectAccessDeniedError):
+        return JSONResponse(
+            status_code=403,
+            content={"detail": "You do not have access to this project"},
         )
 
     # Любая другая ошибка домена
