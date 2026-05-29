@@ -122,7 +122,7 @@ def save_keystore(account, node_data_dir, password):
         json.dump(encrypted, f)
 
 
-def save_env_file(base_dir, v1_addr, v2_addr):
+def save_env_file(base_dir, v1_addr, v2_addr, v1_priv_key):
     env_path = base_dir / ".env"
 
     # Значения по умолчанию для локальной разработки
@@ -155,6 +155,9 @@ def save_env_file(base_dir, v1_addr, v2_addr):
 # --- Конфигурация Блокчейна ---
 VALIDATOR_1_ADDRESS={v1_addr}
 VALIDATOR_2_ADDRESS={v2_addr}
+
+BLOCKCHAIN_URL="http://127.0.0.1:8541"
+BLOCKCHAIN_ADMIN_PRIVATE_KEY="{v1_priv_key}"
 
 # --- Конфигурация Базы Данных ---
 DB_USER={db_user}
@@ -355,7 +358,8 @@ def main():
     save_env_file(
         base_dir,
         v1.address,
-        v2.address
+        v2.address,
+        v1.key.hex()
     )
 
     # --- ЧАСТЬ 3: Сетевой уровень (P2P) ---

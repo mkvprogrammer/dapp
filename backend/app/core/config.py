@@ -54,7 +54,7 @@ class Settings(BaseSettings):
     # Важно: поле написано в UPPER_CASE специально, чтобы соответствовать требованию архитектуры и .env.
     # В коде используйте `settings.BLOCKCHAIN_ADMIN_PRIVATE_KEY`.
     BLOCKCHAIN_ADMIN_PRIVATE_KEY: str = (
-        "7934413e25edc5a05ae9da5a2d87dede206084f46fb18e7ffecabcd5597bc389"
+        "81e33e48cfd7b539682637ad8f64cd5b714cde2430674986fecea3d6ce2dbde7"
     )
 
     # Backward-compat (если где-то уже использовали нижнее имя)

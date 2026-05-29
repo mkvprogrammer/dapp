@@ -230,4 +230,85 @@ describe("University Auction System - Full Flow", function () {
             auction.connect(student3).cancelBid(0)
         ).to.be.revertedWith("Lesson already started, use code confirmation");
     });
+
+    // ============================================================
+    // НОВЫЙ ТЕСТ: Проверка отсутствия дубликатов после rebid
+    // ============================================================
+    it("Should NOT duplicate bidder in list after cancel + rebid", async function () {
+        // === SETUP ===
+        await setupProjectAndAuction({ slots: 2 });
+
+        // Подготовка студента
+        await token.mint(student1.address, 0, 500, "0x");
+        await token.connect(student1).setApprovalForAll(await auction.getAddress(), true);
+
+        // === ШАГ 1: Первая ставка ===
+        await auction.connect(student1).placeBid(0, 100);
+        
+        // Проверка: в лидерборде ровно 1 запись для student1
+        let [users, bids] = await auction.getLeaderboard(0, 0);
+        const countAfterFirstBid = users.filter(u => u === student1.address).length;
+        expect(countAfterFirstBid).to.equal(1, "After first bid: expected 1 entry");
+
+        // === ШАГ 2: Отмена ставки ===
+        await auction.connect(student1).cancelBid(0);
+        
+        // После отмены: студент не должен быть в лидерборде (ставка = 0)
+        [users, bids] = await auction.getLeaderboard(0, 0);
+        const countAfterCancel = users.filter(u => u === student1.address).length;
+        expect(countAfterCancel).to.equal(0, "After cancel: expected 0 entries");
+
+        // === ШАГ 3: Повторная ставка (ребад) ===
+        await auction.connect(student1).placeBid(0, 100);
+        
+        // === ПРОВЕРКА: НЕТ ДУБЛИКАТОВ ===
+        [users, bids] = await auction.getLeaderboard(0, 0);
+        const countAfterRebid = users.filter(u => u === student1.address).length;
+        
+        expect(countAfterRebid).to.equal(1, "After rebid: expected exactly 1 entry (NO DUPLICATES)");
+        
+        // Дополнительно: проверяем, что сумма ставки корректна
+        const studentIndex = users.indexOf(student1.address);
+        expect(bids[studentIndex]).to.equal(100n, "Bid amount should be 100");
+
+        // === ДОПОЛНИТЕЛЬНАЯ ПРОВЕРКА: isStudentInGuaranteedTop ===
+        // Функция должна возвращать консистентный результат, независимо от внутренних дубликатов
+        const inTop1 = await auction.isStudentInGuaranteedTop(0, student1.address);
+        const inTop2 = await auction.isStudentInGuaranteedTop(0, student1.address);
+        expect(inTop1).to.equal(inTop2, "isStudentInGuaranteedTop should be deterministic");
+    });
+
+    // ============================================================
+    // БОНУС-ТЕСТ: Массовая отмена + ребид нескольких студентов
+    // ============================================================
+    it("Should handle multiple cancel+rebid without list corruption", async function () {
+        await setupProjectAndAuction({ slots: 3 });
+
+        const students = [student1, student2, student3];
+        const bidAmounts = [100, 200, 150];
+
+        // Подготовка всех студентов
+        for (let i = 0; i < students.length; i++) {
+            await token.mint(students[i].address, 0, 500, "0x");
+            await token.connect(students[i]).setApprovalForAll(await auction.getAddress(), true);
+            await auction.connect(students[i]).placeBid(0, bidAmounts[i]);
+        }
+
+        // Отменяем и делаем ребид для student1 и student3
+        for (const s of [student1, student3]) {
+            await auction.connect(s).cancelBid(0);
+            await auction.connect(s).placeBid(0, bidAmounts[students.indexOf(s)]); // та же сумма
+        }
+
+        // Проверка: каждый адрес встречается ровно 1 раз
+        const [users, bids] = await auction.getLeaderboard(0, 0);
+        
+        for (const s of students) {
+            const count = users.filter(u => u === s.address).length;
+            expect(count).to.equal(1, `Student ${s.address} should appear exactly once`);
+        }
+
+        // Проверка: общее количество записей = количеству студентов
+        expect(users.length).to.equal(3, "Leaderboard should have exactly 3 entries");
+    });
 });

@@ -13,6 +13,7 @@ typechain/
 typechain-types/
 coverage/
 coverage.json
+deployed.json
 
 # --- INFRA & GETH (Ваши настройки) ---
 infra/data/

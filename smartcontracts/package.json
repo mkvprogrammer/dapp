@@ -1,7 +1,7 @@
 {
   "name": "smartcontracts",
   "version": "1.0.0",
-  "description": "",
+  "description": "This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.",
   "homepage": "https://github.com/mkvprogrammer/dapp#readme",
   "bugs": {
     "url": "https://github.com/mkvprogrammer/dapp/issues"
@@ -14,8 +14,14 @@
   "author": "",
   "type": "commonjs",
   "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.6"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.1.2",
@@ -34,8 +40,5 @@
     "hardhat-gas-reporter": "^2.3.0",
     "solidity-coverage": "^0.8.17",
     "typechain": "^8.3.2"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "^4.9.6"
   }
 }

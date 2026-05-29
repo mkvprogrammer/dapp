@@ -199,6 +199,26 @@ contract AuctionManager is AccessControl, ERC1155Holder {
 
 
     /**
+    * @dev Удаляет адрес из списка участников аукциона (swap-and-pop, O(1)).
+    * Безопасно: если адреса нет в списке — ничего не делает.
+    */
+    function _removeBidderFromList(Auction storage auc, address bidder) internal {
+        address[] storage list = auc.biddersList;
+        uint256 len = list.length;
+        
+        for (uint256 i = 0; i < len; i++) {
+            if (list[i] == bidder) {
+                if (i != len - 1) {
+                    list[i] = list[len - 1];
+                }
+                list.pop();
+                break;
+            }
+        }
+    }
+
+
+    /**
      * @dev Отмена ставки самим студентом.
      * Логика штрафов зависит от того, на какой стадии находится аукцион относительно начала урока.
      * 
@@ -245,6 +265,8 @@ contract AuctionManager is AccessControl, ERC1155Holder {
         // Сначала обнуляем баланс пользователя внутри контракта, чтобы предотвратить реентерабельность (reentrancy).
         auc.bids[msg.sender] = 0;
 
+        _removeBidderFromList(auc, msg.sender);
+
         // Внешние взаимодействия (переводы и сжигание) выполняются после обновления состояния.
         if (refundAmount > 0) {
             // Возврат оставшейся части токенов студенту.
@@ -288,6 +310,7 @@ contract AuctionManager is AccessControl, ERC1155Holder {
         uint256 refundAmount = (bidAmount * refundRate) / BASIS_POINTS;
         
         auc.bids[student] = 0;
+        _removeBidderFromList(auc, student);
 
         tokenContract.safeTransferFrom(address(this), student, auc.projectId, refundAmount, "");
         
@@ -345,91 +368,6 @@ contract AuctionManager is AccessControl, ERC1155Holder {
         
         auc.active = false; // Закрываем этот день навсегда
     }
-
-    // /**
-    //  * @dev Обработка возврата токенов при подтверждении присутствия студента на занятии.
-    //  * Вызывается преподавателем (ORGANIZER) после того, как студент предъявил код/QR-код на паре.
-    //  * 
-    //  * @param auctionId ID аукциона.
-    //  * @param student Адрес студента, который присутствовал.
-    //  */
-    // function processAttendanceRefund(uint256 auctionId, address student) external onlyRole(ORGANIZER_ROLE) {
-    //     Auction storage auc = auctions[auctionId];
-    //     require(auc.active, "Auction not active");
-        
-    //     uint256 bidAmount = auc.bids[student];
-    //     require(bidAmount > 0, "No bid");
-
-    //     // Получаем процент возврата за успешное посещение из реестра (например, 100% или 95%).
-    //     // refundRate хранится в базисных пунктах (10000 = 100%).
-    //     (, uint256 refundRate, ) = registry.getProjectInfo(auc.projectId);
-    //     uint256 refundAmount = (bidAmount * refundRate) / BASIS_POINTS;
-        
-    //     // Обнуляем ставку студента, фиксируя факт обработки.
-    //     auc.bids[student] = 0;
-
-    //     // Переводим токены обратно студенту.
-    //     tokenContract.safeTransferFrom(address(this), student, auc.projectId, refundAmount, "");
-        
-    //     // Если процент возврата меньше 100%, разница сжигается как комиссия платформы/вуза.
-    //     uint256 penalty = bidAmount - refundAmount;
-    //     if (penalty > 0) {
-    //          UniversityToken(address(tokenContract)).burnFrom(address(this), auc.projectId, penalty);
-    //     }
-
-    //     emit RefundIssued(auctionId, student, refundAmount);
-    // }
-
-    // /**
-    //  * @dev Закрытие дня и обработка отсутствующих студентов.
-    //  * Вызывается организатором в конце дня (или на следующий день) для финального расчета.
-    //  * Все студенты, которые не отменились сами или не отметились у преподавателя, получают максимальный штраф.
-    //  * 
-    //  * @param auctionId ID аукциона.
-    //  */
-    // function closeDayAndClearAbsentee(uint256 auctionId) external onlyRole(ORGANIZER_ROLE) {
-    //     Auction storage auc = auctions[auctionId];
-    //     require(auc.active, "Already closed");
-        
-    //     // Проверка времени: закрыть день можно только спустя определенное время после начала урока.
-    //     // Здесь установлено ограничение: минимум 10 часов после начала урока, чтобы дать время на отметку присутствия.
-    //     require(block.timestamp > getLessonStartTime(auc) + 10 hours, "Too early to slash, wait for day end");
-
-    //     // Получаем настройку максимального штрафа за прогул (50%) из реестра.
-    //     (, , uint16[4] memory penalties) = registry.getProjectInfo(auc.projectId);
-    //     uint256 maxPenaltyPercent = penalties[3]; 
-
-    //     // Проход по всем участникам аукциона.
-    //     // Внимание: Если участников очень много, эта функция может превысить лимит газа.
-    //     // Для продакшена с большим числом студентов рекомендуется использовать паттерн pagination или off-chain расчеты.
-    //     for (uint256 i = 0; i < auc.biddersList.length; i++) {
-    //         address student = auc.biddersList[i];
-    //         uint256 remainingBid = auc.bids[student];
-
-    //         // Если ставка все еще числится за студентом, значит он не явился и не отменился.
-    //         if (remainingBid > 0) {
-    //             auc.bids[student] = 0; // Обнуляем запись
-
-    //             uint256 penaltyAmount = (remainingBid * maxPenaltyPercent) / BASIS_POINTS;
-    //             uint256 refundAmount = remainingBid - penaltyAmount;
-
-    //             // Возврат остатка (если штраф не 100%)
-    //             if (refundAmount > 0) {
-    //                 tokenContract.safeTransferFrom(address(this), student, auc.projectId, refundAmount, "");
-    //             }
-                
-    //             // Сжигание штрафа
-    //             if (penaltyAmount > 0) {
-    //                 UniversityToken(address(tokenContract)).burnFrom(address(this), auc.projectId, penaltyAmount);
-    //             }
-                
-    //             emit BidCancelled(auctionId, student, penaltyAmount);
-    //         }
-    //     }
-        
-    //     // Деактивируем аукцион, чтобы больше нельзя было совершать с ним действия.
-    //     auc.active = false;
-    // }
 
     // --- VIEW ФУНКЦИИ И УТИЛИТЫ ---
 
