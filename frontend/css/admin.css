@@ -1,0 +1,131 @@
+/* —— Admin panel —— */
+
+.AdminPage__health {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.AdminPage__health-card {
+  padding: 20px;
+}
+
+.AdminPage__health-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.AdminPage__health-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.AdminPage__health-dot--ok {
+  background: var(--color-success);
+}
+
+.AdminPage__health-dot--warn {
+  background: var(--color-warning);
+}
+
+.AdminPage__health-dot--error {
+  background: var(--color-danger);
+}
+
+.AdminPage__health-name {
+  margin: 0 0 4px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.AdminPage__health-detail {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.AdminPage__emergency {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  background: var(--color-danger-bg);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-radius: var(--radius-lg);
+}
+
+.AdminPage__emergency-text h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-danger);
+}
+
+.AdminPage__emergency-text p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.Btn--danger {
+  color: var(--color-white);
+  background: var(--color-danger);
+}
+
+.Btn--danger:hover {
+  background: #b91c1c;
+}
+
+.AdminPage__role {
+  display: inline-flex;
+  padding: 4px 8px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-sm);
+}
+
+.AdminPage__role--admin {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.AdminPage__role--organizer {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.AdminPage__role--user {
+  color: var(--color-text-muted);
+  background: var(--color-border-light);
+}
+
+.AdminPage__audit-action {
+  font-family: monospace;
+  font-size: 0.8125rem;
+  color: var(--color-primary);
+}
+
+@media (max-width: 1100px) {
+  .AdminPage__health {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .AdminPage__health {
+    grid-template-columns: 1fr;
+  }
+}

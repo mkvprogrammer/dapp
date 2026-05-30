@@ -1,0 +1,251 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Админ-панель — AuctionChain</title>
+    <link rel="stylesheet" href="../css/normalize.css" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/admin.css" />
+  </head>
+  <body>
+    <div class="AppLayout AdminPage">
+      <aside class="AppSidebar">
+        <a href="home.html" class="AppSidebar__brand">
+          <img class="AppSidebar__logo" src="../assets/images/logo.png" alt="" width="40" height="40" />
+          <div class="AppSidebar__brand-text">
+            <p class="AppSidebar__brand-name">AuctionChain</p>
+            <p class="AppSidebar__brand-tagline">Честное распределение ресурсов</p>
+          </div>
+        </a>
+        <nav>
+          <ul class="AppSidebar__nav">
+            <li><a class="AppSidebar__link" href="home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/></svg>Главная</a></li>
+            <li><a class="AppSidebar__link" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.1-7 7-7s7 3 7 7"/></svg>Личный кабинет</a></li>
+            <li><a class="AppSidebar__link" href="projects.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Мои проекты</a></li>
+            <li><a class="AppSidebar__link" href="auctions.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M10 20H4v-6M20 4l-8 8M4 20l8-8"/></svg>Аукционы</a></li>
+            <li><a class="AppSidebar__link" href="transfers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>Переводы токенов</a></li>
+            <li><a class="AppSidebar__link" href="organizer.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>Организатору</a></li>
+            <li><a class="AppSidebar__link" href="create-auction.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>Создать аукцион</a></li>
+          </ul>
+        </nav>
+        <div class="AppSidebar__help">
+          <p class="AppSidebar__help-title">Нужна помощь?</p>
+          <p class="AppSidebar__help-text">Ознакомьтесь с документацией платформы</p>
+          <a href="#" class="Btn Btn--secondary Btn--sm Btn--block">Документация</a>
+        </div>
+        <p class="AppSidebar__footer">&copy; 2026 AuctionChain<br />v0.1.0</p>
+      </aside>
+
+      <div class="AppLayout__main">
+        <header class="AppTopbar">
+          <a href="notifications.html" class="AppTopbar__notify" aria-label="Уведомления">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span class="AppTopbar__notify-badge"></span>
+          </a>
+          <button type="button" class="AppTopbar__user">
+            <span class="Avatar Avatar--sm">ИИ</span>
+            <span>
+              <strong style="display:block;font-size:0.875rem">Иван Иванов</strong>
+              <span style="font-size:0.75rem;color:var(--color-text-muted)">itmo_id: 123456 · Админ</span>
+            </span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </header>
+
+        <main class="AppLayout__content">
+          <header class="PageHeader PageHeader__row">
+            <div>
+              <h1 class="PageHeader__title">Админ-панель</h1>
+              <p class="PageHeader__subtitle">Мониторинг системы, управление пользователями и аудит действий.</p>
+            </div>
+            <a href="organizer.html" class="Btn Btn--secondary">← Организатору</a>
+          </header>
+
+          <div class="AdminPage__emergency">
+            <div class="AdminPage__emergency-text">
+              <h3>Экстренная остановка</h3>
+              <p>Приостанавливает все активные аукционы и блокирует новые ставки. Используйте только в критических ситуациях.</p>
+            </div>
+            <button type="button" class="Btn Btn--danger">⏸ Остановить все аукционы</button>
+          </div>
+
+          <section aria-label="Состояние системы" class="AdminPage__health">
+            <div class="Card AdminPage__health-card">
+              <div class="AdminPage__health-status"><span class="AdminPage__health-dot AdminPage__health-dot--ok"></span> Работает</div>
+              <p class="AdminPage__health-name">API сервер</p>
+              <p class="AdminPage__health-detail">Latency: 42 ms · Uptime: 99.98%</p>
+            </div>
+            <div class="Card AdminPage__health-card">
+              <div class="AdminPage__health-status"><span class="AdminPage__health-dot AdminPage__health-dot--ok"></span> Работает</div>
+              <p class="AdminPage__health-name">База данных</p>
+              <p class="AdminPage__health-detail">PostgreSQL · 1.2k conn/min</p>
+            </div>
+            <div class="Card AdminPage__health-card">
+              <div class="AdminPage__health-status"><span class="AdminPage__health-dot AdminPage__health-dot--warn"></span> Нагрузка</div>
+              <p class="AdminPage__health-name">Очередь аукционов</p>
+              <p class="AdminPage__health-detail">12 активных · 847 ставок/ч</p>
+            </div>
+            <div class="Card AdminPage__health-card">
+              <div class="AdminPage__health-status"><span class="AdminPage__health-dot AdminPage__health-dot--ok"></span> Работает</div>
+              <p class="AdminPage__health-name">Blockchain-узел</p>
+              <p class="AdminPage__health-detail">Block #18492 · Sync OK</p>
+            </div>
+          </section>
+
+          <section class="Card" style="margin-bottom:24px">
+            <div class="Card__header">
+              <h2 class="Card__title">Пользователи</h2>
+              <input type="search" class="Input" placeholder="Поиск по имени или itmo_id…" style="width:240px" />
+            </div>
+            <div class="Card__body Card__body--flush-top">
+              <div class="TableWrap">
+                <table class="Table">
+                  <thead>
+                    <tr>
+                      <th>Пользователь</th>
+                      <th>itmo_id</th>
+                      <th>Роль</th>
+                      <th>Проектов</th>
+                      <th>Последний вход</th>
+                      <th>Статус</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="Avatar Avatar--sm" style="display:inline-flex;vertical-align:middle;margin-right:8px">ИИ</span> Иван Иванов</td>
+                      <td>123456</td>
+                      <td><span class="AdminPage__role AdminPage__role--admin">Админ</span></td>
+                      <td>6</td>
+                      <td>29 мая, 09:14</td>
+                      <td><span class="Badge Badge--success">Активен</span></td>
+                      <td><button type="button" class="Btn Btn--ghost Btn--sm">Изменить</button></td>
+                    </tr>
+                    <tr>
+                      <td><span class="Avatar Avatar--sm" style="display:inline-flex;vertical-align:middle;margin-right:8px">ПА</span> Петров Алексей</td>
+                      <td>111222</td>
+                      <td><span class="AdminPage__role AdminPage__role--organizer">Организатор</span></td>
+                      <td>3</td>
+                      <td>29 мая, 08:45</td>
+                      <td><span class="Badge Badge--success">Активен</span></td>
+                      <td><button type="button" class="Btn Btn--ghost Btn--sm">Изменить</button></td>
+                    </tr>
+                    <tr>
+                      <td><span class="Avatar Avatar--sm" style="display:inline-flex;vertical-align:middle;margin-right:8px">МП</span> Мария Петрова</td>
+                      <td>234567</td>
+                      <td><span class="AdminPage__role AdminPage__role--user">Участник</span></td>
+                      <td>4</td>
+                      <td>28 мая, 22:30</td>
+                      <td><span class="Badge Badge--success">Активен</span></td>
+                      <td><button type="button" class="Btn Btn--ghost Btn--sm">Изменить</button></td>
+                    </tr>
+                    <tr>
+                      <td><span class="Avatar Avatar--sm" style="display:inline-flex;vertical-align:middle;margin-right:8px">НР</span> Никита Романов</td>
+                      <td>678901</td>
+                      <td><span class="AdminPage__role AdminPage__role--user">Участник</span></td>
+                      <td>2</td>
+                      <td>15 мая, 11:00</td>
+                      <td><span class="Badge Badge--warning">Заблокирован</span></td>
+                      <td><button type="button" class="Btn Btn--ghost Btn--sm">Изменить</button></td>
+                    </tr>
+                    <tr>
+                      <td><span class="Avatar Avatar--sm" style="display:inline-flex;vertical-align:middle;margin-right:8px">КД</span> Козлов Дмитрий</td>
+                      <td>222333</td>
+                      <td><span class="AdminPage__role AdminPage__role--organizer">Организатор</span></td>
+                      <td>2</td>
+                      <td>29 мая, 07:20</td>
+                      <td><span class="Badge Badge--success">Активен</span></td>
+                      <td><button type="button" class="Btn Btn--ghost Btn--sm">Изменить</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section class="Card">
+            <div class="Card__header">
+              <h2 class="Card__title">Журнал аудита</h2>
+              <select class="Select" style="width:auto;min-width:160px">
+                <option>Все события</option>
+                <option>Аукционы</option>
+                <option>Пользователи</option>
+                <option>Токены</option>
+                <option>Система</option>
+              </select>
+            </div>
+            <div class="Card__body Card__body--flush-top">
+              <div class="TableWrap">
+                <table class="Table">
+                  <thead>
+                    <tr>
+                      <th>Время</th>
+                      <th>Актор</th>
+                      <th>Действие</th>
+                      <th>Объект</th>
+                      <th>IP</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>29 мая, 09:12:34</td>
+                      <td>Иван Иванов</td>
+                      <td><span class="AdminPage__audit-action">auction.bid_placed</span></td>
+                      <td>Аукцион #1042</td>
+                      <td>185.22.*.*</td>
+                    </tr>
+                    <tr>
+                      <td>29 мая, 08:55:01</td>
+                      <td>Петров Алексей</td>
+                      <td><span class="AdminPage__audit-action">tokens.mint</span></td>
+                      <td>Проект «Математика»</td>
+                      <td>91.105.*.*</td>
+                    </tr>
+                    <tr>
+                      <td>28 мая, 23:40:18</td>
+                      <td>Система</td>
+                      <td><span class="AdminPage__audit-action">auction.completed</span></td>
+                      <td>Аукцион #1038</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>28 мая, 18:30:55</td>
+                      <td>Мария Петрова</td>
+                      <td><span class="AdminPage__audit-action">attendance.confirmed</span></td>
+                      <td>Код MATH-7K2P</td>
+                      <td>178.64.*.*</td>
+                    </tr>
+                    <tr>
+                      <td>28 мая, 14:12:07</td>
+                      <td>Иван Иванов</td>
+                      <td><span class="AdminPage__audit-action">transfer.sent</span></td>
+                      <td>10.00 TKN → Мария Петрова</td>
+                      <td>185.22.*.*</td>
+                    </tr>
+                    <tr>
+                      <td>27 мая, 11:00:00</td>
+                      <td>Иван Иванов</td>
+                      <td><span class="AdminPage__audit-action">user.role_changed</span></td>
+                      <td>Никита Романов → blocked</td>
+                      <td>185.22.*.*</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <nav class="AppMobileNav" aria-label="Мобильная навигация">
+        <a class="AppMobileNav__link" href="home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/></svg>Главная</a>
+        <a class="AppMobileNav__link" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.1-7 7-7s7 3 7 7"/></svg>Профиль</a>
+        <a class="AppMobileNav__link" href="auctions.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M10 20H4v-6M20 4l-8 8M4 20l8-8"/></svg>Аукционы</a>
+        <a class="AppMobileNav__link" href="projects.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Проекты</a>
+        <a class="AppMobileNav__link AppMobileNav__link--active" href="notifications.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>Ещё</a>
+      </nav>
+    </div>
+  </body>
+</html>

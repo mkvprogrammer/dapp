@@ -1,0 +1,147 @@
+/* —— Notifications center —— */
+
+.NotificationsPage__filters {
+  margin-bottom: 24px;
+}
+
+.NotificationsPage__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.NotificationCard {
+  display: flex;
+  gap: 16px;
+  padding: 18px 20px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border-light);
+  border-left-width: 4px;
+  border-radius: var(--radius-lg);
+  transition: box-shadow 0.15s ease;
+}
+
+.NotificationCard:hover {
+  box-shadow: var(--shadow-card);
+}
+
+.NotificationCard--auction {
+  border-left-color: var(--color-primary);
+}
+
+.NotificationCard--transfer {
+  border-left-color: var(--color-info);
+}
+
+.NotificationCard--attendance {
+  border-left-color: var(--color-success);
+}
+
+.NotificationCard--organizer {
+  border-left-color: var(--color-warning);
+}
+
+.NotificationCard--unread {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary-muted);
+}
+
+.NotificationCard__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+}
+
+.NotificationCard--auction .NotificationCard__icon {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.NotificationCard--transfer .NotificationCard__icon {
+  color: var(--color-info);
+  background: var(--color-info-bg);
+}
+
+.NotificationCard--attendance .NotificationCard__icon {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.NotificationCard--organizer .NotificationCard__icon {
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
+}
+
+.NotificationCard__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.NotificationCard__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.NotificationCard__title {
+  margin: 0 0 4px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.NotificationCard__text {
+  margin: 0 0 8px;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+
+.NotificationCard__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: var(--color-text-label);
+}
+
+.NotificationCard__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.NotificationCard__time {
+  font-size: 0.75rem;
+  color: var(--color-text-label);
+  white-space: nowrap;
+}
+
+.NotificationsPage__mark-all {
+  margin-left: auto;
+}
+
+.NotificationsPage__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 640px) {
+  .NotificationCard {
+    flex-direction: column;
+  }
+
+  .NotificationCard__actions {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+  }
+}

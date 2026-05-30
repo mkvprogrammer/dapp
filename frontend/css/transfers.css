@@ -1,0 +1,105 @@
+/* —— Token transfers —— */
+
+.TransfersPage__layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+.TransfersPage__balance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #8b5cf6 100%);
+  border-radius: var(--radius-xl);
+  color: var(--color-white);
+}
+
+.TransfersPage__balance-value {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.TransfersPage__balance-label {
+  margin: 0 0 4px;
+  font-size: 0.8125rem;
+  opacity: 0.85;
+}
+
+.TransfersPage__form-card {
+  max-width: 420px;
+}
+
+.TransfersPage__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.TransfersPage__optional {
+  font-weight: 400;
+  color: var(--color-text-label);
+}
+
+.TransfersPage__comment {
+  min-height: 72px;
+}
+
+.TransfersPage__recipients {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.TransfersPage__recipient {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.TransfersPage__recipient:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary-muted);
+}
+
+.TransfersPage__recipient-name {
+  margin: 0;
+  font-weight: 600;
+}
+
+.TransfersPage__recipient-id {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.TransfersPage__status--completed {
+  color: var(--color-success);
+}
+
+.TransfersPage__status--pending {
+  color: var(--color-warning);
+}
+
+.TransfersPage__status--failed {
+  color: var(--color-danger);
+}
+
+@media (max-width: 1100px) {
+  .TransfersPage__layout {
+    grid-template-columns: 1fr;
+  }
+}
+

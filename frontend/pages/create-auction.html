@@ -1,0 +1,215 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Создать аукцион — AuctionChain</title>
+    <link rel="stylesheet" href="../css/normalize.css" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/create-auction.css" />
+  </head>
+  <body>
+    <div class="AppLayout CreateAuctionPage">
+      <aside class="AppSidebar">
+        <a href="home.html" class="AppSidebar__brand">
+          <img class="AppSidebar__logo" src="../assets/images/logo.png" alt="" width="40" height="40" />
+          <div class="AppSidebar__brand-text">
+            <p class="AppSidebar__brand-name">AuctionChain</p>
+            <p class="AppSidebar__brand-tagline">Честное распределение ресурсов</p>
+          </div>
+        </a>
+        <nav>
+          <ul class="AppSidebar__nav">
+            <li><a class="AppSidebar__link" href="home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/></svg>Главная</a></li>
+            <li><a class="AppSidebar__link" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.1-7 7-7s7 3 7 7"/></svg>Личный кабинет</a></li>
+            <li><a class="AppSidebar__link" href="projects.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Мои проекты</a></li>
+            <li><a class="AppSidebar__link" href="auctions.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M10 20H4v-6M20 4l-8 8M4 20l8-8"/></svg>Аукционы</a></li>
+            <li><a class="AppSidebar__link" href="transfers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>Переводы токенов</a></li>
+            <li><a class="AppSidebar__link" href="organizer.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>Организатору</a></li>
+            <li><a class="AppSidebar__link AppSidebar__link--active" href="create-auction.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>Создать аукцион</a></li>
+          </ul>
+        </nav>
+        <div class="AppSidebar__help">
+          <p class="AppSidebar__help-title">Нужна помощь?</p>
+          <p class="AppSidebar__help-text">Ознакомьтесь с документацией платформы</p>
+          <a href="#" class="Btn Btn--secondary Btn--sm Btn--block">Документация</a>
+        </div>
+        <p class="AppSidebar__footer">&copy; 2026 AuctionChain<br />v0.1.0</p>
+      </aside>
+
+      <div class="AppLayout__main">
+        <header class="AppTopbar">
+          <a href="notifications.html" class="AppTopbar__notify" aria-label="Уведомления">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span class="AppTopbar__notify-badge"></span>
+          </a>
+          <button type="button" class="AppTopbar__user">
+            <span class="Avatar Avatar--sm">ИИ</span>
+            <span>
+              <strong style="display:block;font-size:0.875rem">Иван Иванов</strong>
+              <span style="font-size:0.75rem;color:var(--color-text-muted)">itmo_id: 123456</span>
+            </span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </header>
+
+        <main class="AppLayout__content">
+          <header class="PageHeader">
+            <h1 class="PageHeader__title">Создать аукцион</h1>
+            <p class="PageHeader__subtitle">Настройте параметры аукциона и опубликуйте его для участников проекта.</p>
+          </header>
+
+          <div class="CreateAuctionPage__layout">
+            <form class="CreateAuctionPage__form">
+              <section class="Card CreateAuctionPage__section">
+                <h2 class="CreateAuctionPage__section-title">Проект</h2>
+                <p class="CreateAuctionPage__section-desc">Выберите проект, в рамках которого будет проводиться аукцион.</p>
+                <div class="CreateAuctionPage__fields">
+                  <div class="Field Field--full">
+                    <label class="Field__label" for="project">Проект</label>
+                    <select id="project" class="Select">
+                      <option>Математика</option>
+                      <option>Физика</option>
+                      <option>Программирование</option>
+                      <option>Химия</option>
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              <section class="Card CreateAuctionPage__section">
+                <h2 class="CreateAuctionPage__section-title">Информация об аукционе</h2>
+                <p class="CreateAuctionPage__section-desc">Основные сведения, которые увидят участники.</p>
+                <div class="CreateAuctionPage__fields">
+                  <div class="Field Field--full">
+                    <label class="Field__label" for="title">Название</label>
+                    <input type="text" id="title" class="Input" value="Запись на консультацию по математике" />
+                  </div>
+                  <div class="Field">
+                    <label class="Field__label" for="type">Тип ресурса</label>
+                    <select id="type" class="Select">
+                      <option>Консультация</option>
+                      <option>Лекция</option>
+                      <option>Аудитория</option>
+                      <option>Оборудование</option>
+                    </select>
+                  </div>
+                  <div class="Field">
+                    <label class="Field__label" for="location">Место проведения</label>
+                    <input type="text" id="location" class="Input" value="Ауд. 412" />
+                  </div>
+                  <div class="Field Field--full">
+                    <label class="Field__label" for="description">Описание</label>
+                    <textarea id="description" class="Textarea">Индивидуальная консультация по темам математического анализа: пределы, производные, интегралы. Длительность — 90 минут.</textarea>
+                  </div>
+                </div>
+              </section>
+
+              <section class="Card CreateAuctionPage__section">
+                <h2 class="CreateAuctionPage__section-title">Изображение</h2>
+                <p class="CreateAuctionPage__section-desc">Загрузите обложку для карточки аукциона (необязательно).</p>
+                <div class="CreateAuctionPage__upload" role="button" tabindex="0">
+                  <span class="CreateAuctionPage__upload-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                  </span>
+                  <span>Перетащите файл или нажмите для загрузки</span>
+                  <span style="font-size:0.75rem">PNG, JPG до 2 МБ</span>
+                </div>
+              </section>
+
+              <section class="Card CreateAuctionPage__section">
+                <h2 class="CreateAuctionPage__section-title">Время проведения</h2>
+                <p class="CreateAuctionPage__section-desc">Укажите даты начала и окончания аукциона и самого мероприятия.</p>
+                <div class="CreateAuctionPage__fields">
+                  <div class="Field">
+                    <label class="Field__label" for="auction-start">Начало аукциона</label>
+                    <input type="datetime-local" id="auction-start" class="Input" value="2026-05-28T10:00" />
+                  </div>
+                  <div class="Field">
+                    <label class="Field__label" for="auction-end">Окончание аукциона</label>
+                    <input type="datetime-local" id="auction-end" class="Input" value="2026-05-30T14:00" />
+                  </div>
+                  <div class="Field">
+                    <label class="Field__label" for="event-start">Начало мероприятия</label>
+                    <input type="datetime-local" id="event-start" class="Input" value="2026-05-30T14:00" />
+                  </div>
+                  <div class="Field">
+                    <label class="Field__label" for="event-end">Окончание мероприятия</label>
+                    <input type="datetime-local" id="event-end" class="Input" value="2026-05-30T15:30" />
+                  </div>
+                </div>
+              </section>
+
+              <section class="Card CreateAuctionPage__section">
+                <h2 class="CreateAuctionPage__section-title">Экономика</h2>
+                <p class="CreateAuctionPage__section-desc">Настройте параметры ставок и количество мест.</p>
+                <div class="CreateAuctionPage__fields">
+                  <div class="Field">
+                    <label class="Field__label" for="min-bid">Минимальная ставка (TKN)</label>
+                    <input type="number" id="min-bid" class="Input" value="5" min="1" step="0.5" />
+                  </div>
+                  <div class="Field">
+                    <label class="Field__label" for="bid-step">Шаг ставки (TKN)</label>
+                    <input type="number" id="bid-step" class="Input" value="0.5" min="0.1" step="0.1" />
+                  </div>
+                  <div class="Field">
+                    <label class="Field__label" for="slots">Количество мест</label>
+                    <input type="number" id="slots" class="Input" value="24" min="1" />
+                  </div>
+                  <div class="Field">
+                    <label class="Field__label" for="refund">Возврат при проигрыше (%)</label>
+                    <input type="number" id="refund" class="Input" value="80" min="0" max="100" />
+                  </div>
+                </div>
+              </section>
+
+              <section class="Card CreateAuctionPage__section">
+                <h2 class="CreateAuctionPage__section-title">Правила</h2>
+                <p class="CreateAuctionPage__section-desc">Дополнительные условия участия в аукционе.</p>
+                <div class="CreateAuctionPage__fields">
+                  <div class="Field Field--full">
+                    <label class="Field__label" for="rules">Текст правил</label>
+                    <textarea id="rules" class="Textarea">Участник обязан явиться в указанное время. При неявке без предупреждения за 24 часа ставка не возвращается. Максимум одна ставка на участника.</textarea>
+                  </div>
+                </div>
+                <div class="CreateAuctionPage__actions">
+                  <button type="submit" class="Btn Btn--primary">Опубликовать аукцион</button>
+                  <button type="button" class="Btn Btn--secondary">Сохранить черновик</button>
+                  <a href="auctions.html" class="Btn Btn--ghost">Отмена</a>
+                </div>
+              </section>
+            </form>
+
+            <aside class="CreateAuctionPage__preview">
+              <p style="margin:0 0 12px;font-size:0.8125rem;font-weight:600;color:var(--color-text-muted)">Предпросмотр</p>
+              <article class="Card CreateAuctionPage__preview-card">
+                <div class="CreateAuctionPage__preview-banner"></div>
+                <div class="CreateAuctionPage__preview-body">
+                  <span class="Tag">Математика</span>
+                  <h3 class="CreateAuctionPage__preview-title">Запись на консультацию по математике</h3>
+                  <div class="CreateAuctionPage__preview-meta">
+                    <span>Тип: <strong>Консультация</strong></span>
+                    <span>Место: <strong>Ауд. 412</strong></span>
+                    <span>Мин. ставка: <strong>5.00 TKN</strong></span>
+                    <span>Мест: <strong>24</strong></span>
+                    <span>Аукцион: <strong>28 мая — 30 мая</strong></span>
+                    <span>Мероприятие: <strong>30 мая, 14:00</strong></span>
+                  </div>
+                </div>
+              </article>
+            </aside>
+          </div>
+        </main>
+      </div>
+
+      <nav class="AppMobileNav" aria-label="Мобильная навигация">
+        <a class="AppMobileNav__link" href="home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/></svg>Главная</a>
+        <a class="AppMobileNav__link" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.1-7 7-7s7 3 7 7"/></svg>Профиль</a>
+        <a class="AppMobileNav__link" href="auctions.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M10 20H4v-6M20 4l-8 8M4 20l8-8"/></svg>Аукционы</a>
+        <a class="AppMobileNav__link" href="projects.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Проекты</a>
+        <a class="AppMobileNav__link" href="notifications.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>Ещё</a>
+      </nav>
+    </div>
+  </body>
+</html>

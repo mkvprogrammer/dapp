@@ -1,0 +1,134 @@
+/* —— Create auction form —— */
+
+.CreateAuctionPage__layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+.CreateAuctionPage__form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.CreateAuctionPage__section {
+  padding: 24px;
+}
+
+.CreateAuctionPage__section-title {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.CreateAuctionPage__section-desc {
+  margin: 0 0 20px;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.CreateAuctionPage__fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.CreateAuctionPage__fields .Field--full {
+  grid-column: 1 / -1;
+}
+
+.CreateAuctionPage__upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 160px;
+  padding: 32px;
+  text-align: center;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.CreateAuctionPage__upload:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.CreateAuctionPage__upload-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  color: var(--color-primary);
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.CreateAuctionPage__preview {
+  position: sticky;
+  top: 24px;
+}
+
+.CreateAuctionPage__preview-card {
+  overflow: hidden;
+}
+
+.CreateAuctionPage__preview-banner {
+  height: 100px;
+  background: linear-gradient(135deg, var(--color-primary-light), #e0e7ff);
+}
+
+.CreateAuctionPage__preview-body {
+  padding: 20px;
+}
+
+.CreateAuctionPage__preview-title {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.CreateAuctionPage__preview-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.CreateAuctionPage__preview-meta strong {
+  color: var(--color-text);
+}
+
+.CreateAuctionPage__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+@media (max-width: 1100px) {
+  .CreateAuctionPage__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .CreateAuctionPage__preview {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .CreateAuctionPage__fields {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,485 @@
+.RegistrationPage {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.RegistrationPage__content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.RegistrationPage__site-footer {
+  flex-shrink: 0;
+  padding: 16px 24px 24px;
+  text-align: center;
+}
+
+.RegistrationPage__site-footer p {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+}
+
+/* —— Left panel —— */
+
+.RegistrationPage__aside {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 32px 24px 28px;
+}
+
+.RegistrationPage__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.RegistrationPage__logo {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  display: block;
+}
+
+.RegistrationPage__brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.RegistrationPage__brand-name {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-text);
+}
+
+.RegistrationPage__brand-tagline {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.RegistrationPage__intro {
+  margin-bottom: 20px;
+}
+
+.RegistrationPage__title {
+  margin: 0 0 12px;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.RegistrationPage__title-accent {
+  color: var(--color-primary);
+}
+
+.RegistrationPage__description {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.RegistrationPage__illustration {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0 0 24px;
+}
+
+.RegistrationPage__illustration-img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.RegistrationPage__features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.RegistrationPage__feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.RegistrationPage__feature-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.RegistrationPage__feature-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* —— Right panel —— */
+
+.RegistrationPage__main {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 32px 24px 28px;
+}
+
+.RegistrationPage__card {
+  width: 100%;
+  max-width: 440px;
+  padding: 40px;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.RegistrationPage__card-header {
+  margin-bottom: 28px;
+}
+
+.RegistrationPage__card-title {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.RegistrationPage__card-subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* —— Form —— */
+
+.RegistrationForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.RegistrationForm__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.RegistrationForm__label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-label);
+}
+
+.RegistrationForm__input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.RegistrationForm__input-icon {
+  position: absolute;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.RegistrationForm__input-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.RegistrationForm__input {
+  width: 100%;
+  height: 48px;
+  padding: 0 44px;
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.RegistrationForm__input::placeholder {
+  color: #a0a0a0;
+}
+
+.RegistrationForm__input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 65, 225, 0.12);
+}
+
+.RegistrationForm__toggle-password {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease;
+}
+
+.RegistrationForm__toggle-password:hover {
+  color: var(--color-text);
+}
+
+.RegistrationForm__toggle-password svg {
+  width: 20px;
+  height: 20px;
+}
+
+.RegistrationForm__toggle-password svg[hidden] {
+  display: none;
+}
+
+.RegistrationForm__submit {
+  margin-top: 4px;
+  width: 100%;
+  height: 48px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-white);
+  background: var(--color-primary);
+  border-radius: var(--radius-md);
+  transition: background-color 0.15s ease;
+}
+
+.RegistrationForm__submit:hover {
+  background: var(--color-primary-hover);
+}
+
+.RegistrationForm__submit:active {
+  transform: translateY(1px);
+}
+
+.RegistrationPage__divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.RegistrationPage__divider::before,
+.RegistrationPage__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.RegistrationPage__login-prompt {
+  margin: 0;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.RegistrationPage__login-link {
+  font-weight: 600;
+}
+
+.RegistrationPage__legal {
+  margin-top: 24px;
+  max-width: 440px;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.RegistrationPage__legal p {
+  margin: 0 0 4px;
+}
+
+.RegistrationPage__legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 8px;
+}
+
+.RegistrationPage__legal-links a {
+  font-weight: 500;
+}
+
+/* —— Desktop —— */
+
+@media (min-width: 961px) {
+  .RegistrationPage__content {
+    align-items: stretch;
+  }
+
+  .RegistrationPage__site-footer {
+    padding-bottom: 28px;
+  }
+
+  .RegistrationPage__aside {
+    padding: 48px 56px 40px clamp(40px, 5vw, 80px);
+  }
+
+  .RegistrationPage__brand {
+    margin-bottom: 48px;
+  }
+
+  .RegistrationPage__logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .RegistrationPage__intro {
+    margin-bottom: 28px;
+    max-width: 480px;
+  }
+
+  .RegistrationPage__title {
+    margin-bottom: 16px;
+    font-size: 2.25rem;
+  }
+
+  .RegistrationPage__title-accent {
+    display: block;
+  }
+
+  .RegistrationPage__description {
+    font-size: 1rem;
+    max-width: 440px;
+  }
+
+  .RegistrationPage__illustration {
+    flex: 0 0 auto;
+    margin: 0 0 32px;
+    max-width: 480px;
+  }
+
+  .RegistrationPage__illustration-img {
+    max-width: 480px;
+    max-height: min(42vh, 360px);
+    width: auto;
+  }
+
+  .RegistrationPage__features {
+    flex-wrap: nowrap;
+    gap: 28px;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  .RegistrationPage__main {
+    padding: 48px clamp(32px, 4vw, 80px) 40px clamp(24px, 3vw, 56px);
+  }
+
+  .RegistrationPage__card {
+    max-width: 460px;
+    padding: 44px 48px;
+  }
+
+  .RegistrationPage__legal {
+    max-width: 460px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .RegistrationPage__aside {
+    padding-left: 80px;
+    padding-right: 64px;
+  }
+
+  .RegistrationPage__main {
+    padding-right: 80px;
+  }
+
+  .RegistrationPage__illustration-img {
+    max-width: 520px;
+    max-height: 380px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .RegistrationPage {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  .RegistrationPage__aside,
+  .RegistrationPage__main {
+    flex: 1 1 50%;
+  }
+}
+
+/* —— Tablet & mobile —— */
+
+@media (max-width: 960px) {
+  .RegistrationPage__content {
+    flex-direction: column;
+  }
+
+  .RegistrationPage__aside {
+    flex: none;
+    max-width: none;
+    padding: 32px 24px 24px;
+  }
+
+  .RegistrationPage__brand {
+    margin-bottom: 32px;
+  }
+
+  .RegistrationPage__illustration {
+    display: none;
+  }
+
+  .RegistrationPage__features {
+    display: none;
+  }
+
+  .RegistrationPage__main {
+    padding: 0 24px 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .RegistrationPage__card {
+    padding: 28px 20px;
+  }
+}

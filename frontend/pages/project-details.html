@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Математика — AuctionChain</title>
+    <link rel="stylesheet" href="../css/normalize.css" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/project-details.css" />
+  </head>
+  <body>
+    <div class="AppLayout ProjectDetailsPage">
+      <aside class="AppSidebar">
+        <a href="home.html" class="AppSidebar__brand">
+          <img class="AppSidebar__logo" src="../assets/images/logo.png" alt="" width="40" height="40" />
+          <div class="AppSidebar__brand-text">
+            <p class="AppSidebar__brand-name">AuctionChain</p>
+            <p class="AppSidebar__brand-tagline">Честное распределение ресурсов</p>
+          </div>
+        </a>
+        <nav>
+          <ul class="AppSidebar__nav">
+            <li><a class="AppSidebar__link" href="home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/></svg>Главная</a></li>
+            <li><a class="AppSidebar__link" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.1-7 7-7s7 3 7 7"/></svg>Личный кабинет</a></li>
+            <li><a class="AppSidebar__link AppSidebar__link--active" href="projects.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Мои проекты</a></li>
+            <li><a class="AppSidebar__link" href="auctions.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M10 20H4v-6M20 4l-8 8M4 20l8-8"/></svg>Аукционы</a></li>
+            <li><a class="AppSidebar__link" href="transfers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>Переводы токенов</a></li>
+            <li><a class="AppSidebar__link" href="organizer.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>Организатору</a></li>
+            <li><a class="AppSidebar__link" href="create-auction.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>Создать аукцион</a></li>
+          </ul>
+        </nav>
+        <div class="AppSidebar__help">
+          <p class="AppSidebar__help-title">Нужна помощь?</p>
+          <p class="AppSidebar__help-text">Ознакомьтесь с документацией платформы</p>
+          <a href="#" class="Btn Btn--secondary Btn--sm Btn--block">Документация</a>
+        </div>
+        <p class="AppSidebar__footer">&copy; 2026 AuctionChain<br />v0.1.0</p>
+      </aside>
+
+      <div class="AppLayout__main">
+        <header class="AppTopbar">
+          <a href="notifications.html" class="AppTopbar__notify" aria-label="Уведомления">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span class="AppTopbar__notify-badge"></span>
+          </a>
+          <button type="button" class="AppTopbar__user">
+            <span class="Avatar Avatar--sm">ИИ</span>
+            <span>
+              <strong style="display:block;font-size:0.875rem">Иван Иванов</strong>
+              <span style="font-size:0.75rem;color:var(--color-text-muted)">itmo_id: 123456</span>
+            </span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </header>
+
+        <main class="AppLayout__content">
+          <p style="margin:0 0 16px;font-size:0.875rem"><a href="projects.html">← Мои проекты</a></p>
+
+          <header class="ProjectDetailsPage__hero">
+            <span class="ProjectIcon ProjectIcon--math ProjectDetailsPage__hero-icon">Σ</span>
+            <div class="ProjectDetailsPage__hero-main">
+              <h1 class="ProjectDetailsPage__hero-title">Математика</h1>
+              <p class="ProjectDetailsPage__hero-desc">Учебный проект по дисциплинам математического цикла: математический анализ, линейная алгебра, дифференциальные уравнения. Участники получают токены за посещение занятий и участвуют в аукционах на дополнительные ресурсы.</p>
+              <div class="ProjectDetailsPage__hero-meta">
+                <span>Семестр: <strong>Весна 2026</strong></span>
+                <span>Участников: <strong>128</strong></span>
+                <span>Ваш баланс: <strong>42.50 TKN</strong></span>
+                <span class="Badge Badge--success">Активен</span>
+              </div>
+            </div>
+            <div class="ProjectDetailsPage__organizer">
+              <span class="Avatar Avatar--md">ПА</span>
+              <div class="ProjectDetailsPage__organizer-info">
+                <p class="ProjectDetailsPage__organizer-name">Петров Алексей Сергеевич</p>
+                <p style="color:var(--color-text-muted)">Организатор проекта</p>
+                <p>petrov.a@itmo.ru</p>
+              </div>
+            </div>
+          </header>
+
+          <nav class="Tabs Tabs--underline" aria-label="Разделы проекта" style="margin-bottom:24px">
+            <a href="#" class="Tabs__item Tabs__item--active">Обзор</a>
+            <a href="auctions.html" class="Tabs__item">Аукционы</a>
+            <a href="#" class="Tabs__item">Участники</a>
+            <a href="#" class="Tabs__item">Настройки</a>
+            <a href="#" class="Tabs__item">История</a>
+            <a href="#" class="Tabs__item">Коды посещения</a>
+          </nav>
+
+          <div class="ProjectDetailsPage__layout">
+            <div>
+              <div class="ProjectDetailsPage__widgets">
+                <div class="ProjectDetailsPage__widget">
+                  <p class="ProjectDetailsPage__widget-value">42.50</p>
+                  <p class="ProjectDetailsPage__widget-label">Ваш баланс TKN</p>
+                </div>
+                <div class="ProjectDetailsPage__widget">
+                  <p class="ProjectDetailsPage__widget-value">5</p>
+                  <p class="ProjectDetailsPage__widget-label">Активных аукционов</p>
+                </div>
+                <div class="ProjectDetailsPage__widget">
+                  <p class="ProjectDetailsPage__widget-value">72%</p>
+                  <p class="ProjectDetailsPage__widget-label">Посещаемость</p>
+                </div>
+              </div>
+
+              <section class="Card" style="margin-bottom:24px">
+                <div class="Card__header">
+                  <h2 class="Card__title">Активные аукционы проекта</h2>
+                  <a href="auctions.html" class="Card__link">Все аукционы</a>
+                </div>
+                <div class="Card__body Card__body--flush-top">
+                  <article class="AuctionRow">
+                    <div class="AuctionRow__thumb" role="img" aria-label=""></div>
+                    <div class="AuctionRow__body">
+                      <h3 class="AuctionRow__title">Запись на консультацию по математике</h3>
+                      <div class="AuctionRow__meta">
+                        <span class="Tag">Консультация</span>
+                        <span>⏱ <strong>2ч 15м</strong></span>
+                        <span>Ставка: <strong>12.50 TKN</strong></span>
+                        <span>Мест: <strong>24</strong></span>
+                      </div>
+                    </div>
+                    <a href="auction-details.html" class="Btn Btn--ghost Btn--sm">Участвовать</a>
+                  </article>
+                  <article class="AuctionRow">
+                    <div class="AuctionRow__thumb" role="img" aria-label=""></div>
+                    <div class="AuctionRow__body">
+                      <h3 class="AuctionRow__title">Дополнительная лекция по интегралам</h3>
+                      <div class="AuctionRow__meta">
+                        <span class="Tag">Лекция</span>
+                        <span>⏱ <strong>1д 6ч</strong></span>
+                        <span>Ставка: <strong>8.00 TKN</strong></span>
+                        <span>Мест: <strong>40</strong></span>
+                      </div>
+                    </div>
+                    <a href="auction-details.html" class="Btn Btn--ghost Btn--sm">Участвовать</a>
+                  </article>
+                  <article class="AuctionRow">
+                    <div class="AuctionRow__thumb" role="img" aria-label=""></div>
+                    <div class="AuctionRow__body">
+                      <h3 class="AuctionRow__title">Бронь аудитории 314 для разбора задач</h3>
+                      <div class="AuctionRow__meta">
+                        <span class="Tag">Аудитория</span>
+                        <span>⏱ <strong>3д 12ч</strong></span>
+                        <span>Ставка: <strong>15.00 TKN</strong></span>
+                        <span>Мест: <strong>12</strong></span>
+                      </div>
+                    </div>
+                    <a href="auction-details.html" class="Btn Btn--ghost Btn--sm">Участвовать</a>
+                  </article>
+                </div>
+              </section>
+
+              <section class="Card">
+                <div class="Card__header"><h2 class="Card__title">Недавняя активность</h2></div>
+                <div class="Card__body Card__body--flush-top">
+                  <ul class="ActivityList">
+                    <li class="ActivityItem">
+                      <span class="ActivityItem__icon ActivityItem__icon--in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></span>
+                      <div><p class="ActivityItem__title">Подтверждение посещения</p><p class="ActivityItem__desc">Лекция · Математический анализ</p></div>
+                      <div class="ActivityItem__amount"><p class="ActivityItem__value ActivityItem__value--pos">+5.00 TKN</p><p class="ActivityItem__time">Вчера</p></div>
+                    </li>
+                    <li class="ActivityItem">
+                      <span class="ActivityItem__icon ActivityItem__icon--out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M10 20H4v-6M20 4l-8 8M4 20l8-8"/></svg></span>
+                      <div><p class="ActivityItem__title">Ставка в аукционе</p><p class="ActivityItem__desc">Консультация по математике</p></div>
+                      <div class="ActivityItem__amount"><p class="ActivityItem__value ActivityItem__value--neg">−12.50 TKN</p><p class="ActivityItem__time">2 дня назад</p></div>
+                    </li>
+                  </ul>
+                </div>
+              </section>
+            </div>
+
+            <aside>
+              <section class="Card ProjectDetailsPage__sidebar-section">
+                <div class="Card__header"><h2 class="Card__title">Правила проекта</h2></div>
+                <div class="Card__body Card__body--flush-top">
+                  <ul class="ProjectDetailsPage__rules-list">
+                    <li>Минимальная ставка в аукционах — 1.00 TKN</li>
+                    <li>За посещение лекции начисляется 5.00 TKN</li>
+                    <li>За посещение практики — 3.00 TKN</li>
+                    <li>Возврат ставки при проигрыше — 80%</li>
+                    <li>Максимум 3 активных ставки одновременно</li>
+                  </ul>
+                </div>
+              </section>
+
+              <section class="Card">
+                <div class="Card__header"><h2 class="Card__title">Быстрые действия</h2></div>
+                <div class="Card__body Card__body--flush-top">
+                  <div class="ProjectDetailsPage__actions">
+                    <a href="auctions.html" class="Btn Btn--primary Btn--block">Смотреть аукционы</a>
+                    <a href="transfers.html" class="Btn Btn--secondary Btn--block">Перевести токены</a>
+                    <a href="create-auction.html" class="Btn Btn--secondary Btn--block">Создать аукцион</a>
+                    <button type="button" class="Btn Btn--ghost Btn--block">Ввести код посещения</button>
+                  </div>
+                </div>
+              </section>
+            </aside>
+          </div>
+        </main>
+      </div>
+
+      <nav class="AppMobileNav" aria-label="Мобильная навигация">
+        <a class="AppMobileNav__link" href="home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/></svg>Главная</a>
+        <a class="AppMobileNav__link" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.1-7 7-7s7 3 7 7"/></svg>Профиль</a>
+        <a class="AppMobileNav__link" href="auctions.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M10 20H4v-6M20 4l-8 8M4 20l8-8"/></svg>Аукционы</a>
+        <a class="AppMobileNav__link AppMobileNav__link--active" href="projects.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Проекты</a>
+        <a class="AppMobileNav__link" href="notifications.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>Ещё</a>
+      </nav>
+    </div>
+  </body>
+</html>
