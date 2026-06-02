@@ -1,0 +1,11 @@
+**/node_modules
+**/__pycache__
+**/.venv
+**/venv
+**/.git
+infra/node1_data
+infra/node2_data
+frontend/dist
+smartcontracts/cache
+.env
+**/.env

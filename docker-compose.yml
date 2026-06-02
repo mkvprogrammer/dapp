@@ -1,0 +1,275 @@
+# Единый запуск UniDApp: PoA-сеть, деплой контрактов, миграции БД, API, UI.
+#
+#   docker compose up --build
+#
+# UI:        http://localhost:3000
+# API docs:  http://localhost:8000/docs
+# PgAdmin:   http://localhost:8080
+
+name: unidapp
+
+services:
+  # ---------------------------------------------------------------------------
+  # 1. Генерация genesis, ключей, .env (один раз, пока нет genesis.json)
+  # ---------------------------------------------------------------------------
+  setup:
+    build:
+      context: .
+      dockerfile: docker/setup/Dockerfile
+    volumes:
+      - ./infra:/infra
+    environment:
+      DOCKER_STACK: "1"
+    restart: "no"
+
+  # ---------------------------------------------------------------------------
+  # 2. Geth: init + validators
+  # ---------------------------------------------------------------------------
+  node1-init:
+    image: ethereum/client-go:v1.13.15
+    entrypoint: ["/bin/sh", "/scripts/init.sh"]
+    command: ["/data", "/genesis.json"]
+    volumes:
+      - ./infra/node1_data:/data
+      - ./infra/genesis.json:/genesis.json:ro
+      - ./docker/geth/init.sh:/scripts/init.sh:ro
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+
+  node2-init:
+    image: ethereum/client-go:v1.13.15
+    entrypoint: ["/bin/sh", "/scripts/init.sh"]
+    command: ["/data", "/genesis.json"]
+    volumes:
+      - ./infra/node2_data:/data
+      - ./infra/genesis.json:/genesis.json:ro
+      - ./docker/geth/init.sh:/scripts/init.sh:ro
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+
+  node1:
+    image: ethereum/client-go:v1.13.15
+    container_name: poa-node1
+    restart: unless-stopped
+    env_file:
+      - path: ./infra/.env
+        required: false
+    entrypoint: ["geth"]
+    command:
+      - --datadir=/data
+      - --networkid=1337
+      - --port=30303
+      - --nat=extip:172.30.0.10
+      - --bootnodes=${BOOTNODES}
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.vhosts=*
+      - --http.corsdomain=*
+      - --http.api=eth,net,web3,clique,admin,txpool
+      - --syncmode=full
+      - --mine
+      - --miner.gasprice=0
+      - --miner.etherbase=${VALIDATOR_1_ADDRESS}
+      - --unlock=${VALIDATOR_1_ADDRESS}
+      - --password=/data/password.txt
+      - --allow-insecure-unlock
+      - --verbosity=3
+    ports:
+      - "8541:8545"
+    volumes:
+      - ./infra/node1_data:/data
+      - ./infra/password.txt:/data/password.txt:ro
+    networks:
+      poa_net:
+        ipv4_address: 172.30.0.10
+    depends_on:
+      node1-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "geth attach --exec eth.blockNumber http://127.0.0.1:8545 2>/dev/null | grep -qE '^[0-9]+$'",
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 20s
+
+  node2:
+    image: ethereum/client-go:v1.13.15
+    container_name: poa-node2
+    restart: unless-stopped
+    env_file:
+      - path: ./infra/.env
+        required: false
+    entrypoint: ["geth"]
+    command:
+      - --datadir=/data
+      - --networkid=1337
+      - --port=30304
+      - --nat=extip:172.30.0.20
+      - --bootnodes=${BOOTNODES}
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.vhosts=*
+      - --http.corsdomain=*
+      - --http.api=eth,net,web3,clique,admin,txpool
+      - --syncmode=full
+      - --mine
+      - --miner.gasprice=0
+      - --miner.etherbase=${VALIDATOR_2_ADDRESS}
+      - --unlock=${VALIDATOR_2_ADDRESS}
+      - --password=/data/password.txt
+      - --allow-insecure-unlock
+      - --verbosity=3
+    ports:
+      - "8542:8545"
+    volumes:
+      - ./infra/node2_data:/data
+      - ./infra/password.txt:/data/password.txt:ro
+    networks:
+      poa_net:
+        ipv4_address: 172.30.0.20
+    depends_on:
+      node2-init:
+        condition: service_completed_successfully
+      node1:
+        condition: service_started
+
+  # ---------------------------------------------------------------------------
+  # 3. PostgreSQL, Redis, PgAdmin
+  # ---------------------------------------------------------------------------
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    env_file:
+      - path: ./infra/.env
+        required: false
+    environment:
+      POSTGRES_USER: ${DB_USER:-dev}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-devpass_secure_123}
+      POSTGRES_DB: ${DB_NAME:-unidapp}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - poa_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 3s
+      timeout: 5s
+      retries: 15
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - poa_net
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - poa_net
+    depends_on:
+      - db
+
+  # ---------------------------------------------------------------------------
+  # 4. Hardhat: compile + deploy (ключи из generated_keys.json автоматически)
+  # ---------------------------------------------------------------------------
+  contracts:
+    build:
+      context: .
+      dockerfile: docker/contracts/Dockerfile
+    volumes:
+      - ./smartcontracts:/out
+      - ./infra/scripts/generated_keys.json:/keys/generated_keys.json:ro
+    environment:
+      BLOCKCHAIN_RPC_URL: http://node1:8545
+      KEYS_FILE: /keys/generated_keys.json
+      FORCE_REDEPLOY: ${FORCE_REDEPLOY:-0}
+      OUT_DIR: /out
+    networks:
+      - poa_net
+    depends_on:
+      node1:
+        condition: service_healthy
+    restart: "no"
+
+  # ---------------------------------------------------------------------------
+  # 5. Backend (Alembic upgrade + FastAPI)
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - path: ./infra/.env
+        required: false
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      BLOCKCHAIN_URL: http://node1:8545
+      CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001
+    volumes:
+      - ./smartcontracts:/smartcontracts:ro
+      - ./infra/.env:/infra/.env:ro
+    ports:
+      - "${API_PORT:-8001}:8000"
+    networks:
+      - poa_net
+    depends_on:
+      db:
+        condition: service_healthy
+      contracts:
+        condition: service_completed_successfully
+      node1:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # 6. Frontend (nginx → API proxy)
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3001}:80"
+    networks:
+      - poa_net
+    depends_on:
+      backend:
+        condition: service_healthy
+
+networks:
+  poa_net:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+
+volumes:
+  pgdata:
+  pgadmin_data:

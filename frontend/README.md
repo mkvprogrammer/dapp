@@ -1,18 +1,41 @@
-# AuctionChain — Frontend (static markup)
+# AuctionChain — Frontend
 
-Статическая вёрстка интерфейса платформы AuctionChain. Подготовлено для переноса в React.
+React-приложение (JSX) на основе статической вёрстки в `pages/` и `css/`. Стили подключены без изменений.
 
 ## Структура
 
-- `pages/` — HTML-страницы (auth, dashboard, аукционы, проекты и т.д.)
-- `css/` — стили (`normalize.css`, `main.css`, `dashboard.css`, страничные CSS)
-- `assets/images/` — логотип и иллюстрации
+| Путь | Описание |
+|------|----------|
+| `pages/`, `css/`, `assets/` | Исходные HTML-макеты (референс) |
+| `src/` | React: страницы, API-клиент, layout |
+| `public/` | Статика для Vite (логотип) |
+| `MISSING_API.md` | Эндпоинты, которых не хватает для полного UI |
 
-## Локальный просмотр
+## Запуск
 
-Откройте в браузере, например:
+1. Backend: `cd backend && uvicorn main:app --reload` (порт 8000)
+2. Frontend:
 
-- `pages/home.html` — главная
-- `pages/login.html` / `pages/registration.html` — вход и регистрация
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-Пути к CSS и assets рассчитаны на открытие файлов из папки `pages/`.
+Откройте http://localhost:5173 — запросы к `/api` проксируются на backend.
+
+## Сборка
+
+```bash
+npm run build
+npm run preview
+```
+
+## Маршруты
+
+- `/login`, `/register` — авторизация
+- `/` — главная
+- `/profile`, `/projects`, `/projects/:id`
+- `/auctions`, `/auctions/:id`, `/create-auction`
+- `/transfers`, `/notifications`, `/organizer`
+- `/admin` — только роль `admin`
