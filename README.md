@@ -61,6 +61,64 @@ UniDApp построен по классической многослойной 
 
 ---
 
+## 🐳 Запуск одной командой (Docker Compose)
+
+Весь стек (PoA-ноды, PostgreSQL, деплой контрактов, миграции Alembic, API, React UI) поднимается автоматически. **Ключи копировать вручную не нужно** — они берутся из `infra/scripts/generated_keys.json`.
+
+### Требования
+
+- [Docker](https://docs.docker.com/get-docker/) и Docker Compose v2
+
+### Старт
+
+```bash
+git clone https://github.com/mkvprogrammer/dapp.git
+cd dapp
+make up
+# или: ./scripts/docker-up.sh
+```
+
+Первый запуск занимает несколько минут (сборка образов, `npm ci`, компиляция Solidity).
+
+| Сервис | URL |
+|--------|-----|
+| **Frontend** | http://localhost:3001 (порт `FRONTEND_PORT`) |
+| **API / Swagger** | http://localhost:8001/docs (порт `API_PORT`) |
+| **Health** | http://localhost:8001/health |
+| **Geth node 1** | http://localhost:8541 |
+| **PgAdmin** | http://localhost:8080 (`admin@admin.com` / `adminpassword`) |
+| **PostgreSQL** | `localhost:5433` (user/pass из `infra/.env`) |
+
+### Полезные команды
+
+```bash
+make down    # остановить контейнеры
+make logs    # логи всех сервисов
+make reset   # полный сброс: БД, ноды, genesis, deployed.json — затем снова make up
+```
+
+Принудительный повторный деплой контрактов (без сброса нод):
+
+```bash
+FORCE_REDEPLOY=1 docker compose --env-file infra/.env up --build contracts
+```
+
+Контракты компилируются **офлайн** (`smartcontracts/scripts/compile-offline.js` через npm `solc`), без загрузки с `binaries.soliditylang.org` — это нужно для стабильной работы в Docker.
+
+### Что происходит внутри
+
+1. **setup** — `setup.py`: `genesis.json`, валидаторы, `generated_keys.json`, `infra/.env` (с правками для Docker: `DB_HOST=db`, `BLOCKCHAIN_URL=http://node1:8545`)
+2. **node1 / node2** — Clique PoA Geth
+3. **contracts** — Hardhat: `.env` из ключей → `compile` → `deploy` → `smartcontracts/deployed.json`
+4. **backend** — `alembic upgrade head` → Uvicorn
+5. **frontend** — nginx, прокси `/api` на backend
+
+Подробности: `docker-compose.yml`, каталог `docker/`.
+
+> Ручная пошаговая установка (без Docker) — в разделах ниже.
+
+---
+
 ## 🛠️ Предварительные требования
 
 Перед развёртыванием убедитесь, что установлено:
@@ -522,7 +580,9 @@ dapp/
 │   │   └── core/           # Config, security, blockchain, crypto
 │   ├── alembic/            # Миграции БД
 │   └── scripts/            # check_roles.py, get_token_balance.py
-└── frontend/               # (в разработке) Next.js UI
+├── docker-compose.yml      # единый запуск всего стека
+├── docker/                 # Dockerfile и скрипты сервисов
+└── frontend/               # React (Vite) + статические HTML-макеты
 ```
 
 ---
