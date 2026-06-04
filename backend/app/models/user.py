@@ -44,8 +44,9 @@ class User(Base):
         default=UserRole.STUDENT
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    
-    # server_default и onupdate работают точно так же
+    faculty: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), 

@@ -2,7 +2,11 @@
 HTTP-ручки аукционов.
 """
 
-from fastapi import APIRouter, Depends, status
+import asyncio
+import json
+
+from fastapi import APIRouter, Depends, Query, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import RoleChecker, get_current_user
@@ -13,6 +17,9 @@ from app.schemas.auction import (
     AuctionCreatedResponse,
     AuctionDetailResponse,
     AuctionListResponse,
+    AuctionListResponseExtended,
+    BidHistoryEntry,
+    BidHistoryResponse,
     BidCancelRequest,
     BidCreate,
     BidResponse,
@@ -26,14 +33,53 @@ from database import get_db
 router = APIRouter(prefix="/auctions", tags=["Auctions"])
 
 
-@router.get("/", response_model=list[AuctionListResponse])
-async def list_open_auctions(
+@router.get("/", response_model=list[AuctionListResponseExtended])
+async def list_auctions(
+    project_id: int | None = None,
+    status: str = Query("all", pattern="^(open|closed|cancelled|all)$"),
+    search: str | None = None,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> list[AuctionListResponse]:
-    """Список открытых аукционов."""
-    auctions = await auction_service.get_open_auctions(db)
-    return [AuctionListResponse.model_validate(a) for a in auctions]
+) -> list[AuctionListResponseExtended]:
+    rows = await auction_service.list_auctions(
+        db, user=current_user, project_id=project_id, status=status, search=search
+    )
+    return [AuctionListResponseExtended(**row) for row in rows]
+
+
+@router.get("/{auction_id}/bid-history", response_model=BidHistoryResponse)
+async def bid_history(
+    auction_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> BidHistoryResponse:
+    entries = await auction_service.get_bid_history(db, auction_id)
+    return BidHistoryResponse(
+        auction_id=auction_id,
+        entries=[BidHistoryEntry(**e) for e in entries],
+    )
+
+
+@router.get("/{auction_id}/stream")
+async def auction_stream(
+    auction_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """SSE: обновления лидерборда каждые 5 с."""
+
+    async def event_generator():
+        while True:
+            entries_raw = await auction_service.get_leaderboard(db, auction_id, limit=20)
+            payload = {
+                "type": "leaderboard_update",
+                "auction_id": auction_id,
+                "entries": entries_raw,
+            }
+            yield f"data: {json.dumps(payload, default=str)}\n\n"
+            await asyncio.sleep(5)
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
 @router.get("/{auction_id}", response_model=AuctionDetailResponse)

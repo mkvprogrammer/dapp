@@ -4,7 +4,7 @@
 #
 # UI:        http://localhost:3000
 # API docs:  http://localhost:8000/docs
-# PgAdmin:   http://localhost:8080
+# PgAdmin:   http://localhost:8081
 
 name: unidapp
 
@@ -181,7 +181,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: adminpassword
     ports:
-      - "8080:80"
+      - "8081:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:
@@ -227,6 +227,10 @@ services:
       DB_PORT: "5432"
       BLOCKCHAIN_URL: http://node1:8545
       CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001
+      REDIS_URL: redis://redis:6379/0
+      DEBUG: ${DEBUG:-true}
+      ALLOW_DEMO_TOPUP: ${ALLOW_DEMO_TOPUP:-true}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me-in-production-use-long-random-string}
     volumes:
       - ./smartcontracts:/smartcontracts:ro
       - ./infra/.env:/infra/.env:ro
@@ -249,7 +253,33 @@ services:
       start_period: 30s
 
   # ---------------------------------------------------------------------------
-  # 6. Frontend (nginx → API proxy)
+  # 6. Celery worker + beat
+  # ---------------------------------------------------------------------------
+  worker:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    command: celery -A app.worker.celery_app worker --beat --loglevel=info
+    restart: unless-stopped
+    env_file:
+      - path: ./infra/.env
+        required: false
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      BLOCKCHAIN_URL: http://node1:8545
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./smartcontracts:/smartcontracts:ro
+    networks:
+      - poa_net
+    depends_on:
+      - redis
+      - db
+      - backend
+
+  # ---------------------------------------------------------------------------
+  # 7. Frontend (nginx → API proxy)
   # ---------------------------------------------------------------------------
   frontend:
     build:

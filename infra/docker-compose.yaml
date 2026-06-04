@@ -164,7 +164,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: adminpassword
     ports:
-      - "8080:80" # Веб-интерфейс доступен по адресу http://localhost:8080
+      - "8081:80" # Веб-интерфейс доступен по адресу http://localhost:8081
     volumes:
       - pgadmin_data:/var/lib/pgadmin # Сохранение настроек PgAdmin
     networks:

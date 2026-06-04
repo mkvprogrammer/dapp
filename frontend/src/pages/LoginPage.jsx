@@ -5,6 +5,7 @@ import { ApiError } from '../api/client';
 import AuthFeatureList from '../components/AuthFeatureList';
 import BrandLogo from '../components/BrandLogo';
 import PasswordInput from '../components/PasswordInput';
+import Alert from '../components/ui/Alert';
 import { IconItmoId } from '../components/icons/Icons';
 import { useAuth } from '../context/AuthContext';
 
@@ -73,11 +74,7 @@ export default function LoginPage() {
               <p className="LoginPage__card-subtitle">Введите данные для входа в аккаунт</p>
             </header>
 
-            {error && (
-              <p className="LoginForm__error" style={{ color: 'var(--color-danger, #dc2626)', marginBottom: 12 }}>
-                {error}
-              </p>
-            )}
+            {error && <Alert variant="error">{error}</Alert>}
 
             <form className="LoginForm" onSubmit={handleSubmit} noValidate>
               <div className="LoginForm__field">

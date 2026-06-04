@@ -107,6 +107,9 @@ async def authenticate_user(db: AsyncSession, schema: UserLogin) -> User:
   if user is None or not verify_password(schema.password, user.password_hash):
     raise InvalidCredentialsError()
 
+  user.last_login_at = datetime.now(UTC)
+  await db.commit()
+  await db.refresh(user)
   return user
 
 

@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
+import { NotificationsProvider } from './context/NotificationsContext';
 
 import '../css/normalize.css';
 import '../css/main.css';
+import '../css/ui.css';
 import '../css/dashboard.css';
 import '../css/login.css';
 import '../css/registration.css';
@@ -24,7 +26,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <NotificationsProvider>
+          <App />
+        </NotificationsProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>,

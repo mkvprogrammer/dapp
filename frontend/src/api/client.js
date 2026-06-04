@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || '';
+export const API_BASE = import.meta.env.VITE_API_URL || '';
 
 export class ApiError extends Error {
   constructor(message, status, detail) {
@@ -68,13 +68,32 @@ export async function apiRequest(path, options = {}) {
     if (token) headers.Authorization = `Bearer ${token}`;
   }
 
-  let res = await fetch(`${API_BASE}${path}`, { ...fetchOptions, headers });
+  let res;
+  try {
+    res = await fetch(`${API_BASE}${path}`, { ...fetchOptions, headers });
+  } catch (err) {
+    const hint =
+      API_BASE === ''
+        ? 'Проверьте, что backend запущен (Docker: make up, API :8001; Vite: прокси на 8001 или VITE_DEV_API_TARGET=8000).'
+        : `Не удалось подключиться к ${API_BASE}.`;
+    throw new ApiError(
+      err?.message?.includes('fetch') || err?.name === 'TypeError'
+        ? `Сервер API недоступен. ${hint}`
+        : err?.message || 'Ошибка сети',
+      0,
+      null,
+    );
+  }
 
   if (res.status === 401 && auth && retry) {
     const newToken = await refreshAccessToken();
     if (newToken) {
       headers.Authorization = `Bearer ${newToken}`;
-      res = await fetch(`${API_BASE}${path}`, { ...fetchOptions, headers });
+      try {
+        res = await fetch(`${API_BASE}${path}`, { ...fetchOptions, headers });
+      } catch (err) {
+        throw new ApiError('Сервер API недоступен при повторе запроса.', 0, null);
+      }
     }
   }
 

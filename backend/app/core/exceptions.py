@@ -75,9 +75,25 @@ class InsufficientTokensError(DomainException):
     """Недостаточно токенов на балансе для ставки."""
 
 
+class BidAmountTooLowError(DomainException):
+    """Сумма ставки меньше минимальной для аукциона."""
+
+
 class NotEnrolledInProjectError(DomainException):
-    """Пользователь не записан на проект и не может создать аукцион."""
+    """Пользователь не является участником проекта для запрошенного действия."""
+
+    def __init__(self, detail: str | None = None) -> None:
+        self.detail = detail or "Вы не записаны на этот проект"
+        super().__init__(self.detail)
 
 
 class ProjectAccessDeniedError(DomainException):
     """Нет прав на действия с этим проектом."""
+
+
+class StudentNotInAuctionError(DomainException):
+    """У студента нет активной ставки в этом аукционе."""
+
+
+class AttendanceAlreadyProcessedError(DomainException):
+    """Посещение по этой ставке уже обработано."""

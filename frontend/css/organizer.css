@@ -77,6 +77,49 @@
   margin-bottom: 24px;
 }
 
+.OrganizerPage__charts-inline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.OrganizerPage__mini-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.OrganizerPage__join-code {
+  margin-top: 12px;
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  background: var(--color-success-bg);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  border-radius: var(--radius-md);
+}
+
+.OrganizerPage__join-code strong {
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.08em;
+}
+
+.MintRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.MintRow .Input {
+  width: 72px;
+}
+
+.MintRow__msg {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
 .OrganizerPage__attendance-code {
   display: flex;
   align-items: center;

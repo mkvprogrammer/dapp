@@ -48,3 +48,89 @@
     grid-template-columns: 1fr;
   }
 }
+
+.ActivityList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ActivityList__item {
+  display: grid;
+  gap: 4px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: 0.875rem;
+}
+
+.ActivityList__item:last-child {
+  border-bottom: none;
+}
+
+.ActivityList__item time {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.HomePage__join {
+  margin-bottom: 24px;
+}
+
+.HomePage__activity {
+  margin-top: 24px;
+}
+
+.HomePage__auction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.HomePage__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Profile */
+
+.ProfileHero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+
+.ProfileHero__info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.ProfileHero__name {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.ProfileHero__meta {
+  margin: 0 0 4px;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.ProfileHero__wallet {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-label);
+  word-break: break-all;
+}
+
+.ProfileForm {
+  max-width: 480px;
+}
+
+.JoinProjectForm__toggle {
+  margin: 20px 0 8px;
+  font-size: 0.875rem;
+}

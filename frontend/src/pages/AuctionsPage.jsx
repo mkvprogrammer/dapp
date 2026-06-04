@@ -2,36 +2,45 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { auctionsApi, projectsApi } from '../api';
 import { auctionBannerFor } from '../assets/paths';
+import Alert from '../components/ui/Alert';
+import EmptyState from '../components/ui/EmptyState';
+import LoadingBlock from '../components/ui/LoadingBlock';
+import { useAuth } from '../context/AuthContext';
+import { isOrganizerRole } from '../utils/format';
 
 export default function AuctionsPage() {
+  const { user } = useAuth();
   const [auctions, setAuctions] = useState([]);
   const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState('');
   const [projectFilter, setProjectFilter] = useState('');
   const [tab, setTab] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    Promise.all([auctionsApi.list(), projectsApi.list()])
-      .then(([a, p]) => {
-        setAuctions(a);
-        setProjects(p);
-      })
-      .finally(() => setLoading(false));
+    projectsApi.list().then(setProjects);
   }, []);
 
-  const projectMap = useMemo(() => Object.fromEntries(projects.map((p) => [p.id, p.name])), [projects]);
+  useEffect(() => {
+    setLoading(true);
+    setError('');
+    const params = { status: 'all' };
+    if (projectFilter) params.project_id = Number(projectFilter);
+    if (tab === 'active') params.status = 'open';
+    if (tab === 'closed') params.status = 'closed';
+    if (search.trim()) params.search = search.trim();
+    auctionsApi
+      .list(params)
+      .then(setAuctions)
+      .catch((err) => {
+        setAuctions([]);
+        setError(err.message || 'Не удалось загрузить аукционы');
+      })
+      .finally(() => setLoading(false));
+  }, [projectFilter, tab, search]);
 
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    return auctions.filter((a) => {
-      if (projectFilter && String(a.project_id) !== projectFilter) return false;
-      if (tab === 'active' && !['open', 'active'].includes(a.status)) return false;
-      if (tab === 'closed' && a.status !== 'closed' && a.status !== 'ended') return false;
-      if (q && !a.resource_name.toLowerCase().includes(q)) return false;
-      return true;
-    });
-  }, [auctions, search, projectFilter, tab]);
+  const projectMap = useMemo(() => Object.fromEntries(projects.map((p) => [p.id, p.name])), [projects]);
 
   return (
     <>
@@ -39,28 +48,33 @@ export default function AuctionsPage() {
         <div>
           <h1 className="PageHeader__title">Аукционы</h1>
           <p className="PageHeader__subtitle">
-            Маркетплейс учебных ресурсов: консультации, аудитории, оборудование и дополнительные занятия.
+            Маркетплейс учебных ресурсов: консультации, аудитории, оборудование и доп. занятия.
           </p>
         </div>
-        <Link to="/create-auction" className="Btn Btn--primary">
-          + Создать аукцион
-        </Link>
+        {isOrganizerRole(user?.role) && (
+          <Link to="/create-auction" className="Btn Btn--primary">
+            + Создать аукцион
+          </Link>
+        )}
       </header>
 
-      <div className="Toolbar">
-        <div className="Toolbar__search">
+      <div className="FilterBar">
+        <div className="FilterBar__search">
           <input
             type="search"
             className="Input"
             placeholder="Поиск по названию…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Поиск аукционов"
           />
         </div>
-      </div>
-
-      <div className="AuctionsPage__filters">
-        <select className="Select" value={projectFilter} onChange={(e) => setProjectFilter(e.target.value)}>
+        <select
+          className="Select FilterBar__select"
+          value={projectFilter}
+          onChange={(e) => setProjectFilter(e.target.value)}
+          aria-label="Фильтр по проекту"
+        >
           <option value="">Все проекты</option>
           {projects.map((p) => (
             <option key={p.id} value={p.id}>
@@ -70,7 +84,7 @@ export default function AuctionsPage() {
         </select>
       </div>
 
-      <div className="Tabs" style={{ marginBottom: 24 }}>
+      <div className="Tabs Tabs--spaced">
         <button type="button" className={`Tabs__item${tab === 'all' ? ' Tabs__item--active' : ''}`} onClick={() => setTab('all')}>
           Все
         </button>
@@ -90,16 +104,37 @@ export default function AuctionsPage() {
         </button>
       </div>
 
-      {loading && <p>Загрузка…</p>}
+      {loading && <LoadingBlock />}
+      {error && <Alert variant="error">{error}</Alert>}
 
-      <div className="AuctionsPage__layout">
+      {!loading && !error && auctions.length === 0 && (
+        <EmptyState
+          title={tab === 'active' ? 'Нет активных аукционов' : 'Аукционы не найдены'}
+          action={
+            <Link to="/projects" className="Btn Btn--secondary">
+              Мои проекты
+            </Link>
+          }
+        >
+          {tab === 'active'
+            ? 'Попробуйте вкладку «Все» или сбросьте фильтр проекта.'
+            : 'Запишитесь на проект по коду — тогда появятся аукционы вашего курса.'}
+        </EmptyState>
+      )}
+
+      {!loading && auctions.length > 0 && (
         <div className="AuctionsPage__grid">
-          {filtered.map((a) => (
-            <Link key={a.id} to={`/auctions/${a.id}`} className="AuctionCard">
+          {auctions.map((a) => (
+            <Link key={a.id} to={`/auctions/${a.id}`} className="AuctionCard LinkCard">
               <img className="AuctionCard__banner" src={auctionBannerFor(a.id)} alt="" />
               <div className="AuctionCard__body">
-                <span className={`Badge ${a.status === 'open' || a.status === 'active' ? 'Badge--primary' : 'Badge--success'}`}>
-                  {(a.status === 'open' || a.status === 'active') && <span className="LiveDot" />} {a.status}
+                <span
+                  className={`Badge ${
+                    a.status === 'open' || a.status === 'active' ? 'Badge--primary' : 'Badge--success'
+                  }`}
+                >
+                  {(a.status === 'open' || a.status === 'active') && <span className="LiveDot" />}
+                  {a.status === 'open' ? 'открыт' : a.status}
                 </span>
                 <h2 className="AuctionCard__title">{a.resource_name}</h2>
                 <div className="AuctionCard__meta">
@@ -107,16 +142,20 @@ export default function AuctionsPage() {
                   <span>
                     Мест: <strong>{a.resource_limit}</strong>
                   </span>
+                  {a.current_top_bid != null && (
+                    <span>
+                      Топ: <strong>{a.current_top_bid}</strong> TKN
+                    </span>
+                  )}
                 </div>
                 <div className="AuctionCard__footer">
-                  <span>Проект #{a.project_id}</span>
-                  <span className="Btn Btn--ghost Btn--sm">Участвовать</span>
+                  <span className="AuctionCard__cta">Подробнее →</span>
                 </div>
               </div>
             </Link>
           ))}
         </div>
-      </div>
+      )}
     </>
   );
 }

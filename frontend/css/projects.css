@@ -1,5 +1,38 @@
 /* —— Projects page —— */
 
+.JoinProjectForm__hint {
+  margin: 0 0 16px;
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.JoinProjectForm__error {
+  margin: 12px 0 0;
+  color: var(--color-danger, #dc2626);
+}
+
+.JoinProjectForm__success {
+  margin: 12px 0 0;
+  color: var(--color-success, #16a34a);
+}
+
+.JoinProjectForm--compact .JoinProjectForm__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.JoinProjectForm--compact .Input {
+  flex: 1;
+  min-width: 160px;
+}
+
+.JoinProjectForm--compact .Btn {
+  flex-shrink: 0;
+}
+
 .ProjectsPage__toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -28,6 +61,11 @@
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 20px;
   margin-bottom: 32px;
+}
+
+a.ProjectsPage__card {
+  color: inherit;
+  text-decoration: none;
 }
 
 .ProjectsPage__card {
@@ -144,6 +182,24 @@
 
 @media (max-width: 560px) {
   .ProjectsPage__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .ProjectsPage__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ProjectsPage__toolbar-left,
+  .ProjectsPage__search {
+    width: 100%;
+  }
+
+  .ProjectsPage__search .Input {
+    width: 100%;
+  }
+
+  .ProjectsPage__grid {
     grid-template-columns: 1fr;
   }
 }

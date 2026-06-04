@@ -11,14 +11,23 @@
 }
 
 .NotificationCard {
-  display: flex;
-  gap: 16px;
+  display: block;
   padding: 18px 20px;
+  cursor: default;
   background: var(--color-white);
   border: 1px solid var(--color-border-light);
-  border-left-width: 4px;
+  border-left: 4px solid var(--color-border);
   border-radius: var(--radius-lg);
-  transition: box-shadow 0.15s ease;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.NotificationCard[role='button'] {
+  cursor: pointer;
+}
+
+.NotificationCard[role='button']:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .NotificationCard:hover {
@@ -81,13 +90,28 @@
   height: 20px;
 }
 
-.NotificationCard__body {
-  flex: 1;
-  min-width: 0;
+.NotificationCard__body,
+.NotificationCard > p.NotificationCard__body {
+  margin: 0 0 10px;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.NotificationCard__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.NotificationCard__read-btn {
+  flex-shrink: 0;
 }
 
 .NotificationCard__title {
-  margin: 0 0 4px;
+  margin: 0;
   font-size: 0.9375rem;
   font-weight: 600;
 }
@@ -97,6 +121,13 @@
   font-size: 0.8125rem;
   color: var(--color-text-muted);
   line-height: 1.45;
+}
+
+.NotificationCard__link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 
 .NotificationCard__meta {

@@ -2,9 +2,13 @@
 
 .TransfersPage__layout {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
   gap: 24px;
   align-items: start;
+}
+
+.TransfersPage__form-card {
+  min-width: 0;
 }
 
 .TransfersPage__balance {
@@ -29,10 +33,6 @@
   margin: 0 0 4px;
   font-size: 0.8125rem;
   opacity: 0.85;
-}
-
-.TransfersPage__form-card {
-  max-width: 420px;
 }
 
 .TransfersPage__form {

@@ -65,3 +65,20 @@ export function roleLabel(role) {
   const map = { student: 'Участник', organizer: 'Организатор', admin: 'Админ' };
   return map[role] || role;
 }
+
+/** UUID пользователя из /auth/me (user_id или legacy id). */
+export function authUserId(user) {
+  if (!user) return null;
+  const id = user.user_id ?? user.id;
+  return id != null ? String(id) : null;
+}
+
+export function isOrganizerRole(role) {
+  return role === 'organizer' || role === 'admin';
+}
+
+export function isProjectOrganizer(project, user) {
+  const uid = authUserId(user);
+  if (!uid || !project?.organizer_id) return false;
+  return String(project.organizer_id) === uid;
+}

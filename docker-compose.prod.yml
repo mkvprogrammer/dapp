@@ -1,0 +1,43 @@
+# Production overlay for server deployment.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file infra/.env up -d --build
+#
+# Or: make prod-up
+
+services:
+  node1:
+    ports: !reset []
+
+  node2:
+    ports: !reset []
+
+  db:
+    ports: !reset []
+
+  redis:
+    ports: !reset []
+
+  pgadmin:
+    profiles:
+      - dev-tools
+
+  backend:
+    ports: !reset []
+    environment:
+      DEBUG: ${DEBUG:-false}
+      ALLOW_DEMO_TOPUP: ${ALLOW_DEMO_TOPUP:-false}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://127.0.0.1}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Set JWT_SECRET_KEY in infra/.env}
+    volumes:
+      - uploads_data:/app/uploads
+
+  worker:
+    environment:
+      DEBUG: ${DEBUG:-false}
+
+  frontend:
+    ports:
+      - "${FRONTEND_BIND:-127.0.0.1}:${FRONTEND_PORT:-80}:80"
+
+volumes:
+  uploads_data:

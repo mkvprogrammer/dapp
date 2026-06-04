@@ -3,7 +3,10 @@
 """
 
 from fastapi import Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+
+from app.core.validation_errors import format_validation_errors
 
 from app.core.exceptions import (
     AlreadyEnrolledError,
@@ -11,21 +14,35 @@ from app.core.exceptions import (
     AuctionNotFoundError,
     AuctionTimeError,
     BlockchainCommunicationError,
+    BidAmountTooLowError,
     BidNotFoundError,
     DatabasePersistenceError,
     DomainException,
     InsufficientTokensError,
     NotEnrolledInProjectError,
     ProjectAccessDeniedError,
+    AttendanceAlreadyProcessedError,
     InvalidCredentialsError,
     InvalidRefreshTokenError,
     InvalidWalletPasswordError,
+    StudentNotInAuctionError,
     WalletKeyNotConfiguredError,
     ProjectInactiveError,
     ProjectNotFoundError,
     UserAlreadyExistsError,
     UserNotFoundError,
 )
+
+
+async def request_validation_exception_handler(
+    request: Request,
+    exc: RequestValidationError,
+) -> JSONResponse:
+    """Ошибки Pydantic → понятный detail на русском (для фронта)."""
+    return JSONResponse(
+        status_code=422,
+        content={"detail": format_validation_errors(exc)},
+    )
 
 
 async def domain_exception_handler(
@@ -36,96 +53,110 @@ async def domain_exception_handler(
     if isinstance(exc, UserAlreadyExistsError):
         return JSONResponse(
             status_code=400,
-            content={"detail": "Student ID already registered"},
+            content={"detail": "Пользователь с таким ITMO ID уже зарегистрирован"},
         )
     if isinstance(exc, InvalidCredentialsError):
         return JSONResponse(
             status_code=401,
-            content={"detail": "Incorrect student ID or password"},
+            content={"detail": "Неверный ITMO ID или пароль"},
         )
     if isinstance(exc, InvalidRefreshTokenError):
         return JSONResponse(
             status_code=401,
-            content={"detail": "Invalid, expired or revoked refresh token"},
+            content={"detail": "Сессия истекла или недействительна. Войдите снова"},
         )
     if isinstance(exc, UserNotFoundError):
         return JSONResponse(
             status_code=404,
-            content={"detail": "User not found"},
+            content={"detail": "Пользователь не найден"},
         )
     if isinstance(exc, ProjectNotFoundError):
         return JSONResponse(
             status_code=404,
-            content={"detail": "Project not found"},
+            content={"detail": "Проект не найден"},
         )
     if isinstance(exc, AlreadyEnrolledError):
         return JSONResponse(
             status_code=400,
-            content={"detail": "Student is already enrolled in this project"},
+            content={"detail": "Вы уже записаны на этот проект"},
         )
     if isinstance(exc, ProjectInactiveError):
         return JSONResponse(
             status_code=400,
-            content={"detail": "This project is currently inactive"},
+            content={"detail": "Проект сейчас неактивен"},
         )
     if isinstance(exc, BlockchainCommunicationError):
         return JSONResponse(
             status_code=503,
-            content={"detail": "Blockchain network node is temporarily unavailable"},
+            content={"detail": "Блокчейн-нода временно недоступна. Попробуйте позже"},
         )
     if isinstance(exc, WalletKeyNotConfiguredError):
         return JSONResponse(
             status_code=400,
-            content={"detail": "Wallet private key is not configured for this account"},
+            content={"detail": "Кошелёк не настроен для этого аккаунта"},
         )
     if isinstance(exc, InvalidWalletPasswordError):
         return JSONResponse(
             status_code=400,
-            content={"detail": "Invalid password for wallet decryption"},
+            content={"detail": "Неверный пароль для расшифровки кошелька"},
         )
     if isinstance(exc, DatabasePersistenceError):
         return JSONResponse(
             status_code=500,
-            content={"detail": "Failed to persist application data"},
+            content={"detail": "Не удалось сохранить данные. Попробуйте позже"},
         )
     if isinstance(exc, AuctionNotFoundError):
         return JSONResponse(
             status_code=404,
-            content={"detail": "Auction not found"},
+            content={"detail": "Аукцион не найден"},
         )
     if isinstance(exc, AuctionClosedError):
         return JSONResponse(
             status_code=400,
-            content={"detail": "This auction is already closed or cancelled"},
+            content={"detail": "Аукцион уже завершён или отменён"},
         )
     if isinstance(exc, AuctionTimeError):
         return JSONResponse(
             status_code=400,
-            content={"detail": "Invalid lesson start time or duration"},
+            content={"detail": "Некорректное время или длительность занятия"},
         )
     if isinstance(exc, BidNotFoundError):
         return JSONResponse(
             status_code=404,
-            content={"detail": "Bid not found"},
+            content={"detail": "Ставка не найдена"},
         )
     if isinstance(exc, InsufficientTokensError):
         return JSONResponse(
             status_code=400,
-            content={"detail": "Insufficient university token balance"},
+            content={"detail": "Недостаточно токенов на балансе"},
+        )
+    if isinstance(exc, BidAmountTooLowError):
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "Сумма ставки меньше минимальной для этого аукциона"},
         )
     if isinstance(exc, NotEnrolledInProjectError):
         return JSONResponse(
             status_code=403,
-            content={"detail": "You must be enrolled in the project to create an auction"},
+            content={"detail": exc.detail},
         )
     if isinstance(exc, ProjectAccessDeniedError):
         return JSONResponse(
             status_code=403,
-            content={"detail": "You do not have access to this project"},
+            content={"detail": "Нет доступа к этому проекту"},
+        )
+    if isinstance(exc, StudentNotInAuctionError):
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "У студента нет активной ставки в этом аукционе"},
+        )
+    if isinstance(exc, AttendanceAlreadyProcessedError):
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "Посещение по этой ставке уже обработано"},
         )
 
-    # Любая другая ошибка домена
     return JSONResponse(
         status_code=422,
-        content={"detail": "Business logic error"},
+        content={"detail": "Ошибка выполнения операции"},
     )

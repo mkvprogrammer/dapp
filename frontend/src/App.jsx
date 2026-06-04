@@ -33,11 +33,25 @@ export default function App() {
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="projects/:projectId" element={<ProjectDetailsPage />} />
         <Route path="auctions" element={<AuctionsPage />} />
+        <Route
+          path="create-auction"
+          element={
+            <ProtectedRoute roles={['organizer', 'admin']}>
+              <CreateAuctionPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="auctions/:auctionId" element={<AuctionDetailsPage />} />
-        <Route path="create-auction" element={<CreateAuctionPage />} />
         <Route path="transfers" element={<TransfersPage />} />
         <Route path="notifications" element={<NotificationsPage />} />
-        <Route path="organizer" element={<OrganizerPage />} />
+        <Route
+          path="organizer"
+          element={
+            <ProtectedRoute roles={['organizer', 'admin']}>
+              <OrganizerPage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
       <Route

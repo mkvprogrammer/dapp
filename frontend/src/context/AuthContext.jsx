@@ -4,6 +4,11 @@ import { getAccessToken, getStoredTokens, setStoredTokens } from '../api/client'
 
 const AuthContext = createContext(null);
 
+function normalizeUser(me) {
+  if (!me) return null;
+  return { ...me, user_id: me.user_id ?? me.id };
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +21,7 @@ export function AuthProvider({ children }) {
     }
     try {
       const me = await authApi.me();
-      setUser(me);
+      setUser(normalizeUser(me));
     } catch {
       setStoredTokens(null);
       setUser(null);
@@ -32,7 +37,7 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (studentId, password) => {
     const tokens = await authApi.login({ student_id: studentId, password });
     setStoredTokens(tokens);
-    const me = await authApi.me();
+    const me = normalizeUser(await authApi.me());
     setUser(me);
     return me;
   }, []);

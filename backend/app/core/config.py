@@ -41,6 +41,10 @@ class Settings(BaseSettings):
     app_name: str = "UniDApp API"
     debug: bool = False
 
+    redis_url: str = "redis://127.0.0.1:6379/0"
+    upload_dir: str = "uploads"
+    allow_demo_topup: bool = False
+
     # JWT (security.py)
     jwt_secret_key: str = "change-me-in-production-use-long-random-string"
     algorithm: str = "HS256"
