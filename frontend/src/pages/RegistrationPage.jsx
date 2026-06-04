@@ -6,6 +6,7 @@ import { ApiError } from '../api/client';
 import AuthFeatureList from '../components/AuthFeatureList';
 import BrandLogo from '../components/BrandLogo';
 import PasswordInput from '../components/PasswordInput';
+import Alert from '../components/ui/Alert';
 import { IconItmoId, IconUser } from '../components/icons/Icons';
 
 export default function RegistrationPage() {
@@ -21,24 +22,14 @@ export default function RegistrationPage() {
   if (privateKey) {
     return (
       <div className="LoginPage">
-        <div className="LoginPage__content" style={{ maxWidth: 560, margin: '0 auto' }}>
+        <div className="LoginPage__content LoginPage__content--narrow">
           <div className="LoginPage__card">
             <h2 className="LoginPage__card-title">Сохраните приватный ключ</h2>
             <p className="LoginPage__card-subtitle">
               Ключ кошелька показывается один раз. Сохраните его в надёжном месте — восстановление через API
               недоступно.
             </p>
-            <pre
-              style={{
-                wordBreak: 'break-all',
-                padding: 12,
-                background: 'var(--color-surface-muted)',
-                borderRadius: 8,
-                fontSize: '0.75rem',
-              }}
-            >
-              {privateKey}
-            </pre>
+            <pre className="AuthKeyBox">{privateKey}</pre>
             <button type="button" className="LoginForm__submit" onClick={() => navigate('/login')}>
               Перейти ко входу
             </button>
@@ -112,7 +103,7 @@ export default function RegistrationPage() {
               <p className="RegistrationPage__card-subtitle">Заполните форму для создания аккаунта</p>
             </header>
 
-            {error && <p style={{ color: 'var(--color-danger, #dc2626)', marginBottom: 12 }}>{error}</p>}
+            {error && <Alert variant="error">{error}</Alert>}
 
             <form className="RegistrationForm" onSubmit={handleSubmit} noValidate>
               <div className="RegistrationForm__field">

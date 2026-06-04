@@ -1,22 +1,30 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { auctionsApi, projectsApi } from '../api';
-import ApiNotice from '../components/ApiNotice';
 import { auctionBannerFor } from '../assets/paths';
-import { formatDateTime, projectStyle } from '../utils/format';
+import { formatDateTime, formatTkn, projectStyle } from '../utils/format';
 
 export default function ProjectDetailsPage() {
   const { projectId } = useParams();
   const [project, setProject] = useState(null);
+  const [balance, setBalance] = useState(null);
+  const [attendanceStats, setAttendanceStats] = useState(null);
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const id = Number(projectId);
-    Promise.all([projectsApi.get(id), auctionsApi.list()])
-      .then(([p, allAuctions]) => {
+    Promise.all([
+      projectsApi.get(id),
+      projectsApi.balance(id).catch(() => null),
+      projectsApi.attendanceStats(id).catch(() => null),
+      auctionsApi.list({ project_id: id, status: 'open' }),
+    ])
+      .then(([p, bal, stats, projectAuctions]) => {
         setProject(p);
-        setAuctions(allAuctions.filter((a) => a.project_id === id));
+        setBalance(bal);
+        setAttendanceStats(stats);
+        setAuctions(projectAuctions);
       })
       .finally(() => setLoading(false));
   }, [projectId]);
@@ -43,6 +51,11 @@ export default function ProjectDetailsPage() {
             <p className="ProjectDetailsPage__meta">
               Возврат при отмене: {project.refund_rate}% · Начальная эмиссия: {project.initial_supply} TKN
             </p>
+            {project.join_code && (
+              <p className="ProjectDetailsPage__meta">
+                Код для записи: <strong>{project.join_code}</strong>
+              </p>
+            )}
           </div>
         </div>
         <span className={`Badge ${project.is_active ? 'Badge--success' : ''}`}>
@@ -50,10 +63,34 @@ export default function ProjectDetailsPage() {
         </span>
       </header>
 
-      <ApiNotice>
-        Баланс по проекту, посещаемость и коды присутствия в API пока отсутствуют — отображаются только данные
-        GET /projects/{'{id}'} и аукционы проекта.
-      </ApiNotice>
+      {balance && (
+        <section className="Card" style={{ marginTop: 24 }}>
+          <div className="Card__header">
+            <h2 className="Card__title">Баланс в проекте</h2>
+          </div>
+          <div className="Card__body">
+            <p>
+              Доступно: <strong>{formatTkn(balance.available)}</strong> · Заморожено:{' '}
+              <strong>{formatTkn(balance.frozen)}</strong>
+            </p>
+          </div>
+        </section>
+      )}
+
+      {attendanceStats && (
+        <section className="Card" style={{ marginTop: 24 }}>
+          <div className="Card__header">
+            <h2 className="Card__title">Посещаемость</h2>
+          </div>
+          <div className="Card__body">
+            <p>
+              Средняя посещаемость: {attendanceStats.average_attendance_percent}% · Сессий:{' '}
+              {attendanceStats.total_sessions}
+              {attendanceStats.my_visits != null && ` · Ваши визиты: ${attendanceStats.my_visits}`}
+            </p>
+          </div>
+        </section>
+      )}
 
       <section className="Card" style={{ marginTop: 24 }}>
         <div className="Card__header">

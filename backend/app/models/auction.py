@@ -4,7 +4,7 @@ import enum
 from uuid import UUID, uuid4
 from datetime import datetime
 from decimal import Decimal
-from sqlalchemy import String, DateTime, ForeignKey, Integer, BigInteger, Numeric, func, Enum
+from sqlalchemy import String, Text, DateTime, ForeignKey, Integer, BigInteger, Numeric, func, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import Base
 
@@ -17,9 +17,10 @@ class AuctionStatus(str, enum.Enum):
 # 2. Создаем Enum для статусов ставок студента
 class BidStatus(str, enum.Enum):
     LOCKED = "locked"      # Ставка заблокирована на аукционе
-    REFUNDED = "refunded"  # Токены вернулись студенту (после отмены или проигрыша)
-    BURNED = "burned"      # Токены сгорели в качестве штрафа за позднюю отмену
-    CLAIMED = "claimed"    # Аукцион завершен, и ставка зафиксирована
+    REFUNDED = "refunded"  # Токены вернулись (отмена, подтверждение посещения)
+    BURNED = "burned"      # Штраф (прогул после закрытия дня)
+    CLAIMED = "claimed"    # Аукцион завершен, ставка зафиксирована
+    ABSENT = "absent"      # Преподаватель отметил прогул (до закрытия дня)
 
 
 class Auction(Base):
@@ -36,6 +37,12 @@ class Auction(Base):
     
     resource_limit: Mapped[int] = mapped_column(Integer)  # Количество мест для победителей (например, 2)
     blockchain_auction_id: Mapped[int] = mapped_column(BigInteger, unique=True) # ID аукциона в Solidity
+    resource_type: Mapped[str] = mapped_column(String(32), default="consultation")
+    location: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    min_bid: Mapped[Decimal] = mapped_column(Numeric(78, 0), default=Decimal(1))
+    bid_step: Mapped[Decimal] = mapped_column(Numeric(78, 0), default=Decimal(1))
+    image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     
     # Применяем созданный Enum. native_enum=False сохранит его в базе как обычную строку (VARCHAR)
     status: Mapped[AuctionStatus] = mapped_column(

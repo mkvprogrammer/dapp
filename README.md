@@ -1,592 +1,232 @@
-# 🚀 UniDApp API
+# UniDApp (AuctionChain)
 
-**Университетская экосистема аукционов на приватной блокчейн-сети PoA.**
+Университетская платформа аукционов на приватной PoA-сети: распределение ограниченных ресурсов (консультации, аудитории, оборудование) через ставки во внутренних токенах проекта.
 
-UniDApp — децентрализованная платформа для честного распределения ограниченных ресурсов в университете: записи на защиту работ, бронирования коворкингов, слотов на лабораторные и другие дефицитные активности. Участники делают ставки внутренними токенами проекта; победители получают доступ к ресурсу, а система штрафов и возвратов мотивирует ответственное поведение.
-
-**Стек технологий:**
-
-- **FastAPI** — асинхронный REST API и Swagger-документация
-- **SQLAlchemy 2.0** — ORM и миграции через Alembic
-- **PostgreSQL** — реляционное хранилище метаданных и сессий
-- **Web3.py** — интеграция с Geth и смарт-контрактами
-- **Hardhat** — компиляция, тестирование и деплой Solidity-контрактов
-- **Docker Compose** — PoA-ноды, PostgreSQL, Redis, PgAdmin
-- **PyJWT** — access/refresh JWT с ротацией
-- **Passlib** — bcrypt-хэширование паролей
+| Компонент | Технологии |
+|-----------|------------|
+| API | FastAPI, SQLAlchemy 2, Alembic, PyJWT |
+| БД | PostgreSQL, Redis (Celery) |
+| Блокчейн | Geth Clique PoA, Web3.py, Hardhat, Solidity (ERC-1155) |
+| UI | React (Vite), nginx |
+| Запуск | Docker Compose |
 
 ---
 
-## 🏛️ Архитектура системы
-
-UniDApp построен по классической многослойной схеме. Каждый слой решает одну задачу и не смешивает ответственность.
+## Архитектура
 
 ```
-[ Frontend ]  →  HTTP/WS
-[ FastAPI API ]  →  PostgreSQL · Redis · Geth RPC
-[ Smart Contracts ]  →  Clique PoA Blockchain
+[ Browser ] → nginx (frontend) → FastAPI (backend)
+                                    ↓
+              PostgreSQL · Redis · Geth RPC · смарт-контракты
 ```
 
-### Слои приложения
+| Слой | Каталог | Назначение |
+|------|---------|------------|
+| API | `backend/app/api/` | HTTP, JWT, делегирование в сервисы |
+| Сервисы | `backend/app/services/` | Бизнес-логика, relayer, аукционы |
+| ORM | `backend/app/models/` | Пользователи, проекты, аукционы |
+| Контракты | `smartcontracts/contracts/` | `UniversityToken`, `ProjectRegistry`, `AuctionManager` |
 
-| Слой | Расположение | Назначение |
-|------|--------------|------------|
-| **API (веб-ручки)** | `backend/app/api/` | Маршрутизация HTTP, OAuth2 Bearer, делегирование в сервисы |
-| **Сервисы (бизнес-логика)** | `backend/app/services/` | Регистрация, аукционы, проекты, on-chain relayer |
-| **Валидация Pydantic** | `backend/app/schemas/` | Входные/выходные DTO, отсечение секретных полей |
-| **ORM SQLAlchemy** | `backend/app/models/` | Пользователи, проекты, аукционы, refresh-токены |
-| **Web3-клиент** | `backend/app/core/blockchain.py` | Singleton Web3, ABI из Hardhat-артефактов, подпись транзакций |
-
-**Конвейер запроса:** JSON → Pydantic-схема → Сервис → SQLAlchemy ORM / Web3 → Pydantic `response_model` → JSON.
-
-### Смарт-контракты
-
-| Контракт | Стандарт | Роль |
-|----------|----------|------|
-| `UniversityToken.sol` | ERC-1155 | Мультитокены: каждый `projectId` — отдельный баланс |
-| `ProjectRegistry.sol` | AccessControl | Реестр курсов, штрафы, лимиты, права организаторов |
-| `AuctionManager.sol` | AccessControl | Аукционы: блокировка токенов, ставки, штрафы, возвраты |
-
-### Ролевая модель (RBAC)
-
-Права распределены на двух уровнях: **PostgreSQL (роль пользователя API)** и **OpenZeppelin AccessControl (on-chain роли)**.
-
-| Роль API | On-chain роль | Права |
-|----------|---------------|-------|
-| **Admin** | `DEFAULT_ADMIN_ROLE` | Назначение организаторов, emergency-операции, mint от имени платформы |
-| **Organizer / Teacher** | `ORGANIZER_ROLE` | Создание проектов, настройка правил, генерация кодов, аукционы |
-| **Student** | `USER_ROLE` (AuctionManager) | Участие в аукционах, ставки, P2P-переводы внутри проекта |
-
-> **Важно:** токены разных проектов **изолированы**. ERC-1155 хранит балансы в двумерной таблице `projectId → address → amount`.
+Роли API: `admin`, `organizer`, `student`. Токены разных проектов изолированы (ERC-1155, `projectId` как token id).
 
 ---
 
-## 🐳 Запуск одной командой (Docker Compose)
-
-Весь стек (PoA-ноды, PostgreSQL, деплой контрактов, миграции Alembic, API, React UI) поднимается автоматически. **Ключи копировать вручную не нужно** — они берутся из `infra/scripts/generated_keys.json`.
+## Локальный запуск (разработка)
 
 ### Требования
 
-- [Docker](https://docs.docker.com/get-docker/) и Docker Compose v2
+- Docker и Docker Compose v2.24+ (для production overlay с `ports: !reset`)
+- 4+ ГБ RAM, 10+ ГБ диск
 
-### Старт
+### Команды
 
 ```bash
-git clone https://github.com/mkvprogrammer/dapp.git
+git clone <repository-url>
 cd dapp
 make up
-# или: ./scripts/docker-up.sh
 ```
 
-Первый запуск занимает несколько минут (сборка образов, `npm ci`, компиляция Solidity).
+Первый запуск: генерация genesis и ключей, сборка образов, деплой контрактов, миграции Alembic.
 
-| Сервис | URL |
-|--------|-----|
-| **Frontend** | http://localhost:3001 (порт `FRONTEND_PORT`) |
-| **API / Swagger** | http://localhost:8001/docs (порт `API_PORT`) |
-| **Health** | http://localhost:8001/health |
-| **Geth node 1** | http://localhost:8541 |
-| **PgAdmin** | http://localhost:8080 (`admin@admin.com` / `adminpassword`) |
-| **PostgreSQL** | `localhost:5433` (user/pass из `infra/.env`) |
-
-### Полезные команды
+| Сервис | URL (по умолчанию) |
+|--------|-------------------|
+| UI | http://localhost:3001 |
+| API / Swagger | http://localhost:8001/docs |
+| Health | http://localhost:8001/health |
+| PostgreSQL | localhost:5433 |
+| PgAdmin | http://localhost:8081 (`admin@admin.com` / `adminpassword`) |
 
 ```bash
-make down    # остановить контейнеры
-make logs    # логи всех сервисов
-make reset   # полный сброс: БД, ноды, genesis, deployed.json — затем снова make up
+make down          # остановка
+make logs          # логи
+make pull-images   # повторная загрузка образов с Hub
+make migrate       # только Alembic
+make reset         # полный сброс данных (БД, ноды, ключи)
 ```
 
-Принудительный повторный деплой контрактов (без сброса нод):
+При `TLS handshake timeout` при pull: `make pull-images`, зеркало `DOCKER_MIRROR=docker.m.daocloud.io/library make pull-images`, затем `make up`. Обход pull: `SKIP_IMAGE_PULL=1 make up`.
 
-```bash
-FORCE_REDEPLOY=1 docker compose --env-file infra/.env up --build contracts
-```
-
-Контракты компилируются **офлайн** (`smartcontracts/scripts/compile-offline.js` через npm `solc`), без загрузки с `binaries.soliditylang.org` — это нужно для стабильной работы в Docker.
-
-### Что происходит внутри
-
-1. **setup** — `setup.py`: `genesis.json`, валидаторы, `generated_keys.json`, `infra/.env` (с правками для Docker: `DB_HOST=db`, `BLOCKCHAIN_URL=http://node1:8545`)
-2. **node1 / node2** — Clique PoA Geth
-3. **contracts** — Hardhat: `.env` из ключей → `compile` → `deploy` → `smartcontracts/deployed.json`
-4. **backend** — `alembic upgrade head` → Uvicorn
-5. **frontend** — nginx, прокси `/api` на backend
-
-Подробности: `docker-compose.yml`, каталог `docker/`.
-
-> Ручная пошаговая установка (без Docker) — в разделах ниже.
+Порядок старта: `setup` → Geth → `contracts` → `backend` (миграции + API) → `frontend` (прокси `/api` на backend).
 
 ---
 
-## 🛠️ Предварительные требования
+## Развёртывание на сервере
 
-Перед развёртыванием убедитесь, что установлено:
+Подготовлено для типичного сценария: Linux-сервер, Docker, TLS через внешний nginx/Caddy. Наружу публикуется только фронтенд (порт задаётся в `infra/.env`); PostgreSQL, Redis, Geth и прямой порт API не пробрасываются.
 
-| Инструмент | Минимальная версия | Назначение |
-|------------|-------------------|------------|
-| **Python** | 3.11+ | Backend, скрипты infra |
-| **Node.js** | 18+ | Hardhat, деплой контрактов |
-| **Docker Desktop** | актуальная | Geth-ноды, PostgreSQL, Redis, PgAdmin |
-| **Git** | любая актуальная | Клонирование репозитория |
-
-**Опционально:** `curl` — для проверки RPC-нод без браузера.
-
----
-
-## ⚙️ Быстрое развертывание
-
-### Шаг 1. Клонирование и настройка окружения
+### 1. Подготовка сервера
 
 ```bash
-git clone https://github.com/mkvprogrammer/dapp.git
+# Ubuntu/Debian
+sudo apt update
+sudo apt install -y git docker.io docker-compose-plugin
+sudo usermod -aG docker $USER
+# перелогиньтесь
+```
+
+Откройте в firewall только 80/443 (reverse proxy). Порт приложения (`FRONTEND_PORT`, по умолчанию 80 на `127.0.0.1`) не обязан быть доступен из интернета.
+
+### 2. Клонирование и конфигурация
+
+```bash
+git clone <repository-url>
 cd dapp
+
+# Опционально: переопределения для продакшена (пароли, домен, JWT)
+cp .env.production.example .env.production
+# Отредактируйте .env.production: CORS_ORIGINS, DB_PASSWORD, домен
 ```
 
-#### `infra/.env` — инфраструктура и БД
+Файл `infra/.env` создаётся автоматически при первом деплое (`setup`). Скрипт `deploy-server.sh` подмешивает `.env.production`, если он есть, и генерирует `JWT_SECRET_KEY`, если не задан.
 
-Файл **генерируется автоматически** скриптом `setup.py`. Ниже — структура переменных (см. также `infra/.env.example`):
+Обязательно перед боевым запуском:
 
-```env
-# --- PoA Blockchain ---
-VALIDATOR_1_ADDRESS=0x...
-VALIDATOR_2_ADDRESS=0x...
-BLOCKCHAIN_URL="http://127.0.0.1:8541"
-BLOCKCHAIN_ADMIN_PRIVATE_KEY="..."   # validator1.private_key из generated_keys.json
+| Переменная | Действие |
+|------------|----------|
+| `JWT_SECRET_KEY` | Случайная строка (`openssl rand -hex 32`) |
+| `DB_PASSWORD` | Не оставлять `devpass_secure_123` |
+| `CORS_ORIGINS` | Публичный URL, например `https://auction.example.edu` |
+| `DEBUG` | `false` |
+| `ALLOW_DEMO_TOPUP` | `false` |
+| `FRONTEND_BIND` | `127.0.0.1` при reverse proxy на том же хосте |
 
-# --- P2P / Bootnodes ---
-BOOTNODES=enode://...@172.30.0.10:30303,enode://...@172.30.0.20:30304
-
-# --- PostgreSQL ---
-DB_USER=dev
-DB_PASSWORD=devpass_secure_123
-DB_NAME=unidapp
-DB_HOST=127.0.0.1
-DB_PORT=5433
-```
-
-#### `smartcontracts/.env` — ключи для деплоя
-
-Создайте файл по образцу `smartcontracts/.env.example`. Три приватных ключа берутся из `infra/scripts/generated_keys.json`:
-
-```env
-LOCAL_POA_DEPLOYER_KEY=0x...
-LOCAL_POA_ORGANIZER_KEY=0x...
-LOCAL_POA_RELAYER_KEY=0x...
-```
-
-> **Совет:** после `setup.py` скопируйте ключи deployer / organizer / relayer в `smartcontracts/.env`, а `validator1.private_key` — в `BLOCKCHAIN_ADMIN_PRIVATE_KEY` в `infra/.env`.
-
----
-
-### Шаг 2. Инициализация и запуск блокчейн-сети
+### 3. Запуск
 
 ```bash
-cd infra
-
-# Виртуальное окружение для Python-скриптов
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-# Linux / macOS
-# source venv/bin/activate
-
-pip install -r requirements.txt
-
-# Генерация genesis.json, keystore валидаторов, .env и generated_keys.json
-python scripts/setup.py
-
-# Запуск PoA-сети + PostgreSQL + Redis + PgAdmin
-docker compose up -d
+make prod-up
+# или: ./scripts/deploy-server.sh
 ```
 
-**RPC-эндпоинты:**
-
-| Нода | HTTP RPC |
-|------|----------|
-| Node 1 (Validator 1) | `http://localhost:8541` |
-| Node 2 (Validator 2) | `http://localhost:8542` |
-
-**Проверка работоспособности сети:**
+Проверка:
 
 ```bash
-# Номер блока (result — hex-номер блока)
-curl -X POST http://localhost:8541 \
-  -H "Content-Type: application/json" \
-  -d "{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"params\":[],\"id\":1}"
-
-# Список аккаунтов (не пустой массив)
-curl -X POST http://localhost:8541 \
-  -H "Content-Type: application/json" \
-  -d "{\"jsonrpc\":\"2.0\",\"method\":\"eth_accounts\",\"params\":[],\"id\":1}"
-
-# Gas price = 0 (бесплатная сеть)
-curl -X POST http://localhost:8541 \
-  -H "Content-Type: application/json" \
-  -d "{\"jsonrpc\":\"2.0\",\"method\":\"eth_gasPrice\",\"params\":[],\"id\":1}"
-
-# Пиринг: node1 видит node2 (172.30.0.20)
-curl -X POST http://localhost:8541 \
-  -H "Content-Type: application/json" \
-  -d "{\"jsonrpc\":\"2.0\",\"method\":\"admin_peers\",\"params\":[],\"id\":1}"
+curl -sS http://127.0.0.1/health
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file infra/.env ps
+make prod-logs
 ```
 
-> В логах Docker допустимы сообщения `WARN` и `Block failed` — это нормально для Clique PoA: ноды генерируют блоки поочерёдно, и каждая вторая попытка «лишней» ноды будет отклонена.
+Остановка: `make prod-down`.
 
-**Остановка сети:**
+### 4. TLS и reverse proxy
+
+Пример конфигурации nginx на хосте: [`deploy/nginx-reverse-proxy.example.conf`](deploy/nginx-reverse-proxy.example.conf).
+
+Схема:
+
+```
+Internet → nginx (443) → 127.0.0.1:80 (контейнер frontend)
+                              ↳ /api → backend:8000
+```
+
+UI ходит в API по тому же origin (`/api/...`), отдельный `VITE_API_URL` на сервере не нужен.
+
+### 5. Обновление версии
 
 ```bash
-docker compose down
+git pull
+make prod-up
+```
+
+Миграции выполняются в `deploy-server.sh` и при старте контейнера `backend`.
+
+### 6. Резервное копирование
+
+- Том Docker `pgdata` — PostgreSQL
+- Том `uploads_data` — загруженные изображения (`docker-compose.prod.yml`)
+- `infra/node1_data`, `infra/node2_data` — блокчейн (при сбросе потребуется повторный деплой контрактов)
+- `smartcontracts/deployed.json` — адреса контрактов (генерируется сервисом `contracts`)
+
+Не коммитьте в git: `infra/.env`, `infra/scripts/generated_keys.json`, `infra/genesis.json`, `smartcontracts/deployed.json`.
+
+### 7. PgAdmin (только отладка)
+
+В production PgAdmin отключён (profile `dev-tools`). Для доступа к БД используйте `docker compose exec db psql` или временно:
+
+```bash
+docker compose --profile dev-tools -f docker-compose.yml -f docker-compose.prod.yml --env-file infra/.env up -d pgadmin
 ```
 
 ---
 
-### Шаг 3. Деплой смарт-контрактов
+## Ручная установка (без полного Compose)
+
+Используйте, если API и UI запускаются локально, а инфраструктура — в Docker.
+
+1. `cd infra && python -m venv venv && pip install -r requirements.txt && python scripts/setup.py`
+2. `docker compose up -d` в `infra/` — Geth и PostgreSQL
+3. `cd smartcontracts && npm ci && npx hardhat compile && npx hardhat run scripts/deploy.js --network localPoA`
+4. Скопируйте ключи из `infra/scripts/generated_keys.json` в `smartcontracts/.env` и `BLOCKCHAIN_ADMIN_PRIVATE_KEY` в `infra/.env`
+5. `cd backend && pip install -r requirements.txt && alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000`
+6. `cd frontend && npm ci && npm run dev` (прокси API — см. `vite.config.js`)
+
+---
+
+## Безопасность
+
+- JWT: access (короткий TTL) + refresh с ротацией; в БД хранится только SHA-256 refresh.
+- Кошельки: приватный ключ шифруется паролем пользователя (Fernet); на регистрации ключ показывается один раз.
+- Web3: для Clique PoA обязателен `geth_poa_middleware` (`backend/app/core/blockchain.py`).
+- Проценты: в PostgreSQL — `Numeric`; в Solidity — basis points (10 000 = 100%).
+
+---
+
+## CLI (backend/scripts)
 
 ```bash
-cd ../smartcontracts
-
-npm install
-npm install dotenv --save-dev
-npm install @openzeppelin/contracts
-
-# Компиляция Solidity → ABI + bytecode в artifacts/
-npx hardhat compile
-
-# Деплой в localPoA (Docker-ноды должны быть запущены!)
-npx hardhat run scripts/deploy.js --network localPoA
+cd backend && source venv/bin/activate
+python scripts/check_roles.py [0xAddress]
+python scripts/get_token_balance.py [0xAddress] [project_token_id]
 ```
 
-**Результат деплоя:**
-
-- `smartcontracts/artifacts/contracts/` — ABI и bytecode (используются backend и CLI-скриптами)
-- `smartcontracts/deployed.json` — адреса `ProjectRegistry`, `UniversityToken`, `AuctionManager` и назначенные роли
-
-**Опционально — smoke-тест после деплоя:**
-
-```bash
-npx hardhat run scripts/TestAfterDeployContractsToPoA.js --network localPoA
-```
-
-**Полезные команды Hardhat:**
-
-```bash
-npx hardhat test      # прогон всех тестов
-npx hardhat clean     # очистка кэша компиляции
-```
+Требуются запущенная нода и `infra/.env`.
 
 ---
 
-### Шаг 4. Настройка и миграции базы данных
+## API
 
-```bash
-cd ../backend
+После запуска backend: Swagger на `/docs`. Авторизация: `POST /api/v1/auth/login` → `Authorize` → `Bearer <access_token>`.
 
-# Новое venv для backend (отдельно от infra)
-python -m venv venv
-venv\Scripts\activate          # Windows
-# source venv/bin/activate     # Linux / macOS
-
-pip install -r requirements.txt
-```
-
-Убедитесь, что контейнер PostgreSQL запущен:
-
-```bash
-cd ../infra
-docker compose up -d db
-```
-
-Примените миграции Alembic из каталога `backend/`:
-
-```bash
-cd ../backend
-
-# Создание новой миграции (при изменении моделей в app/models/)
-alembic revision --autogenerate -m "описание изменений"
-
-# Применение всех миграций
-alembic upgrade head
-
-# Проверка текущей ревизии
-alembic current
-```
-
-> Новые модели добавляйте в `app/models/` и **импортируйте** в `app/models/__init__.py`, иначе autogenerate их не увидит.
-
-**PgAdmin** (визуальный доступ к БД):
-
-1. Откройте [http://localhost:8080](http://localhost:8080)
-2. Логин: `admin@admin.com` / `adminpassword`
-3. **Register Server** → Host: `db`, Port: `5432`, Database: `unidapp`, User: `dev`, Password: `devpass_secure_123`
+Основные группы: `auth`, `dashboard`, `users`, `projects`, `auctions`, `attendance`, `transfers`, `notifications`, `wallet`, `admin`, `uploads`.
 
 ---
 
-### Шаг 5. Запуск бэкенда FastAPI
-
-```bash
-cd backend
-venv\Scripts\activate
-
-# Вариант 1 — через uvicorn с hot-reload
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-
-# Вариант 2 — через точку входа
-python main.py
-```
-
-**Проверка:**
-
-| URL | Описание |
-|-----|----------|
-| [http://localhost:8000](http://localhost:8000) | Корневой эндпоинт |
-| [http://localhost:8000/health](http://localhost:8000/health) | Health-check (PostgreSQL) |
-| [http://localhost:8000/docs](http://localhost:8000/docs) | Swagger UI |
-
----
-
-### 🔄 Полный сброс блокчейн-сети
-
-Если нужно пересоздать сеть с нуля:
-
-```bash
-cd infra
-docker compose down
-# Удалите папки node1_data и node2_data
-venv\Scripts\activate
-python scripts/setup.py
-docker compose up -d
-
-cd ../smartcontracts
-# Обновите .env ключами из infra/scripts/generated_keys.json
-npx hardhat run scripts/deploy.js --network localPoA
-
-# Обновите BLOCKCHAIN_ADMIN_PRIVATE_KEY в infra/.env
-cd ../backend
-alembic upgrade head
-python main.py
-```
-
----
-
-## 🔒 Особенности безопасности и Web3-логики
-
-### Refresh Token Rotation
-
-UniDApp использует **парную схему JWT**:
-
-- **Access Token** — короткоживущий (по умолчанию 30 мин), передаётся в заголовке `Authorization: Bearer <token>`
-- **Refresh Token** — долгоживущий (7 дней), используется только для получения новой пары
-
-**Ротация при обновлении:**
-
-1. Клиент отправляет refresh-токен на `/api/v1/auth/refresh`
-2. Backend ищет **SHA-256 хэш** токена в таблице `refresh_tokens`
-3. Если токен валиден и не отозван — он **немедленно помечается `is_revoked = True`**
-4. Выпускается **новая пара** access + refresh; новый refresh сохраняется в БД
-
-Это защищает от **replay-атак**: украденный refresh-токен можно использовать только один раз. Повторное использование отозванного токена отклоняется.
-
-> Сырой refresh-токен **никогда не хранится** в PostgreSQL — только его хэш.
-
----
-
-### Полукастодиальные кошельки (Semi-Custodial Wallets)
-
-При регистрации backend:
-
-1. Генерирует EOA-кошелёк через `eth_account.Account.create()`
-2. Шифрует приватный ключ **паролем пользователя** (не хэшем!) алгоритмом **Fernet (AES-128-CBC + HMAC-SHA256)**
-3. Сохраняет в БД только `wallet_address` и `encrypted_private_key`
-4. Возвращает расшифрованный ключ **один раз** на фронтенд (для экспорта / резервной копии)
-
-**KDF:** PBKDF2-HMAC-SHA256, 100 000 итераций → ключ Fernet.
-
-При on-chain операциях (ставка, создание проекта) пользователь передаёт пароль; backend расшифровывает ключ **в памяти сессии**, подписывает транзакцию и не сохраняет ключ в открытом виде.
-
-> **Компромисс UX / безопасность:** пользователю не нужен MetaMask и газ на балансе (relayer + gasPrice=0), но доверие к backend обязательно для хранения зашифрованного ключа.
-
----
-
-### `geth_poa_middleware` — обязателен для Clique PoA
-
-Стандартный алгоритм расчёта `blockHash` в Ethereum (PoW/PoS) **не совместим** с PoA-сетями (Clique, Aura). Geth в PoA записывает в поле `extraData` подпись валидатора, из-за чего Web3.py без middleware:
-
-- возвращает **неверный block hash**
-- некорректно обрабатывает **nonce** и **receipt**
-- может «терять» транзакции после `send_raw_transaction`
-
-**Решение** — инъекция middleware при инициализации Web3:
-
-```python
-from web3.middleware import geth_poa_middleware
-
-w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8541"))
-w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-```
-
-Используется во всех точках: `blockchain.py`, `check_roles.py`, `get_token_balance.py`.
-
----
-
-### Проценты в БД vs Basis Points в Solidity
-
-| Контекст | Формат | Пример «80% возврата» |
-|----------|--------|----------------------|
-| **PostgreSQL** | `Numeric(5, 2)` — человекочитаемые проценты | `80.00` |
-| **Solidity** | Basis Points (BPS), `100% = 10 000` | `8000` |
-
-**Конвертация на backend** (`project_service.py`):
-
-```python
-def _decimal_to_basis_points(rate: Decimal) -> int:
-    return int(rate * 100)   # 80.00 → 8000 bps
-```
-
-**В контракте** штрафы и возвраты считаются так:
-
-```solidity
-uint256 penaltyAmount = (bidAmount * penaltyPercent) / BASIS_POINTS;  // BASIS_POINTS = 10_000
-```
-
-> **Почему BPS on-chain?** Целочисленная арифметика без ошибок округления `float`; стандарт DeFi для процентных ставок, комиссий и штрафов.
-
----
-
-## 📡 Проверка и администрирование (CLI)
-
-Утилиты в `backend/scripts/` работают автономно: читают `infra/.env`, подключаются к RPC и загружают ABI из Hardhat-артефактов.
-
-### `check_roles.py` — проверка on-chain ролей
-
-Проверяет `DEFAULT_ADMIN_ROLE`, `ORGANIZER_ROLE` и `USER_ROLE` для указанного адреса.
-
-```bash
-cd backend
-venv\Scripts\activate
-
-# Интерактивный режим (выбор контракта 1–3)
-python scripts/check_roles.py
-
-# С адресом аргументом
-python scripts/check_roles.py 0xCf3EE4870EC092cD1F28291AB6cd8fDbD0EBBB25
-```
-
-**Доступные контракты:**
-
-| № | Контракт | Роли |
-|---|----------|------|
-| 1 | `AuctionManager` | ADMIN, ORGANIZER, USER |
-| 2 | `ProjectRegistry` | ADMIN, ORGANIZER |
-| 3 | `UniversityToken` | ADMIN, ORGANIZER, USER |
-
-**Пример вывода:**
-
-```
-🌐 Подключено к сети: http://127.0.0.1:8541
-📜 Контракт [ProjectRegistry]: 0x...
-🔎 Проверяю адрес: 0xCf3E...
---------------------------------------------------
-👑 Роль ADMIN (DEFAULT_ADMIN_ROLE):  ❌ НЕТ
-👨‍🏫 Роль TEACHER (ORGANIZER_ROLE):  ✅ ДА
-🎓 Роль STUDENT (USER_ROLE):       ❌ НЕТ
-```
-
----
-
-### `get_token_balance.py` — баланс ERC-1155 (`balanceOf`)
-
-Запрашивает on-chain баланс токенов проекта для кошелька.
-
-```bash
-cd backend
-venv\Scripts\activate
-
-# Интерактивный режим
-python scripts/get_token_balance.py
-
-# С аргументами: адрес + blockchain project ID
-python scripts/get_token_balance.py 0xCf3EE4870EC092cD1F28291AB6cd8fDbD0EBBB25 1
-```
-
-**Пример вывода:**
-
-```
-🌐 Сеть: http://127.0.0.1:8541
-🪙 Контракт токена (ERC-1155): 0x...
-🔎 Проверяемый кошелек: 0xCf3E...
-📚 ID Проекта (Token ID): 1
-------------------------------------------------------------
-📊 Текущий баланс токенов в блокчейне: 💰 1000 UT
-```
-
-> `project_id` — это **blockchain ID** проекта (token ID в ERC-1155), а не UUID из PostgreSQL.
-
----
-
-## 📖 Документация API
-
-### Swagger UI
-
-1. Запустите backend (см. Шаг 5)
-2. Откройте **[http://localhost:8000/docs](http://localhost:8000/docs)**
-3. Изучите эндпоинты: `/api/v1/auth/`, `/api/v1/projects/`, `/api/v1/auctions/`, `/api/v1/admin/`
-
-### Авторизация через кнопку **Authorize**
-
-1. Зарегистрируйтесь: `POST /api/v1/auth/register`
-2. Войдите: `POST /api/v1/auth/login` — получите `access_token` и `refresh_token`
-3. Нажмите **Authorize** (🔒) в правом верхнем углу Swagger
-4. В поле **Value** введите:
-
-   ```
-   Bearer <ваш_access_token>
-   ```
-
-   *(слово `Bearer` и пробел обязательны)*
-
-5. Нажмите **Authorize** → **Close**
-6. Теперь защищённые эндпоинты (🔒) можно вызывать через **Try it out**
-
-**Обновление токена:**
-
-```
-POST /api/v1/auth/refresh
-Body: { "refresh_token": "<refresh_token>" }
-```
-
-**Выход:**
-
-```
-POST /api/v1/auth/logout
-Body: { "refresh_token": "<refresh_token>" }
-```
-
----
-
-## 📁 Структура репозитория
+## Структура репозитория
 
 ```
 dapp/
-├── infra/                  # PoA-сеть, Docker Compose, genesis, setup.py
-├── smartcontracts/         # Solidity, Hardhat, deployed.json, artifacts/
-├── backend/                # FastAPI, Alembic, CLI-скрипты
-│   ├── app/
-│   │   ├── api/            # HTTP-ручки
-│   │   ├── services/       # Бизнес-логика
-│   │   ├── schemas/        # Pydantic-модели
-│   │   ├── models/         # SQLAlchemy ORM
-│   │   └── core/           # Config, security, blockchain, crypto
-│   ├── alembic/            # Миграции БД
-│   └── scripts/            # check_roles.py, get_token_balance.py
-├── docker-compose.yml      # единый запуск всего стека
-├── docker/                 # Dockerfile и скрипты сервисов
-└── frontend/               # React (Vite) + статические HTML-макеты
+├── docker-compose.yml          # полный стек (разработка)
+├── docker-compose.prod.yml     # overlay для сервера
+├── .env.production.example     # шаблон продакшен-переменных
+├── deploy/                     # пример nginx
+├── scripts/                    # docker-up.sh, deploy-server.sh, migrate.sh
+├── infra/                      # genesis, setup.py, локальный compose
+├── smartcontracts/             # Hardhat, контракты
+├── backend/                    # FastAPI, Alembic
+└── frontend/                   # React UI
 ```
 
 ---
 
-## 📄 Лицензия
+## Лицензия
 
-Уточняется. См. файл `LICENSE` в корне репозитория.
+См. файл `LICENSE` в корне репозитория.

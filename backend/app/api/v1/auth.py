@@ -91,4 +91,4 @@ async def get_me(
     """
     # Просто возвращаем объект. Pydantic-модель UserResponse сама 
     # отфильтрует password_hash и красиво преобразует типы данных.
-    return current_user
+    return UserResponse.model_validate(current_user)

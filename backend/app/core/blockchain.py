@@ -342,9 +342,31 @@ class BlockchainService:
         )
         return await self._send_admin_tx(func)
 
-    def get_project_info(self, project_id: int) -> dict[str, Any]:
-        """Синхронный .call() к контракту за данными проекта (для будущих фич)."""
-        raise NotImplementedError
+    async def transfer_tokens_onchain(
+        self,
+        sender_private_key: str,
+        recipient_wallet: str,
+        project_blockchain_id: int,
+        amount: int,
+    ) -> str:
+        """ERC-1155 safeTransferFrom между студентами."""
+        sender = Account.from_key(sender_private_key)
+        from_addr = Web3.to_checksum_address(sender.address)
+        to_addr = Web3.to_checksum_address(recipient_wallet)
+        func = self.token_contract.functions.safeTransferFrom(
+            from_addr,
+            to_addr,
+            int(project_blockchain_id),
+            int(amount),
+            b"",
+        )
+        return await self._send_signed_tx(sender_private_key, func)
+
+    async def get_block_number(self) -> int:
+        def _call() -> int:
+            return int(self.w3.eth.block_number)
+
+        return await asyncio.to_thread(_call)
 
     async def _ensure_token_approval_for_auction(self, owner_private_key: str) -> str | None:
         """
@@ -480,6 +502,57 @@ class BlockchainService:
             )
 
         return await asyncio.to_thread(_call)
+
+    async def mark_as_absent_onchain(
+        self,
+        blockchain_auction_id: int,
+        student_wallet: str,
+        organizer_private_key: str,
+    ) -> str:
+        """markAsAbsent — только ORGANIZER_ROLE у msg.sender."""
+        addr = Web3.to_checksum_address(student_wallet)
+        func = self.auction_contract.functions.markAsAbsent(int(blockchain_auction_id), addr)
+        return await self._send_signed_tx(organizer_private_key, func)
+
+    async def process_attendance_refund_onchain(
+        self,
+        blockchain_auction_id: int,
+        student_wallet: str,
+        organizer_private_key: str,
+    ) -> str:
+        """processAttendanceRefund — подтверждение присутствия преподавателем."""
+        addr = Web3.to_checksum_address(student_wallet)
+        func = self.auction_contract.functions.processAttendanceRefund(
+            int(blockchain_auction_id),
+            addr,
+        )
+        return await self._send_signed_tx(organizer_private_key, func)
+
+    async def close_day_and_refund_remaining_onchain(
+        self,
+        blockchain_auction_id: int,
+        organizer_private_key: str,
+    ) -> str:
+        """closeDayAndRefundRemaining — закрытие дня после начала занятия."""
+        func = self.auction_contract.functions.closeDayAndRefundRemaining(
+            int(blockchain_auction_id),
+        )
+        return await self._send_signed_tx(organizer_private_key, func)
+
+    def get_project_info(self, project_id: int) -> dict[str, Any]:
+        """Синхронный .call() к ProjectRegistry.getProjectInfo."""
+
+        def _call() -> dict[str, Any]:
+            info = self.registry_contract.functions.getProjectInfo(int(project_id)).call()
+            return {
+                "name": info[0],
+                "owner": info[1],
+                "refund_rate_bps": int(info[2]),
+                "penalty_schedule": list(info[3]),
+                "is_active": bool(info[4]),
+            }
+
+        return _call()
 
 
 # Singleton-экземпляр (инициализируется один раз)

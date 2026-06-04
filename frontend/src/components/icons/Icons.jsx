@@ -139,6 +139,22 @@ export function IconUser(props) {
   );
 }
 
+export function IconMenu(props) {
+  return (
+    <svg {...svgProps} strokeLinecap="round" {...props}>
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </svg>
+  );
+}
+
+export function IconClose(props) {
+  return (
+    <svg {...svgProps} strokeLinecap="round" {...props}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
 export const AUTH_FEATURES = [
   { Icon: IconShieldCheck, label: 'Честные аукционы' },
   { Icon: IconTokens, label: 'Токены за активность' },
@@ -151,6 +167,7 @@ export const SIDEBAR_NAV = [
   { to: '/projects', label: 'Мои проекты', Icon: IconProjects },
   { to: '/auctions', label: 'Аукционы', Icon: IconAuctions },
   { to: '/transfers', label: 'Переводы токенов', Icon: IconTransfers },
+  { to: '/notifications', label: 'Уведомления', Icon: IconBell },
   { to: '/organizer', label: 'Организатору', Icon: IconOrganizer },
   { to: '/create-auction', label: 'Создать аукцион', Icon: IconCreateAuction },
 ];

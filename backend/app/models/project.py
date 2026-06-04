@@ -28,7 +28,8 @@ class Project(Base):
     penalty_schedule: Mapped[list[int]] = mapped_column(JSONB, server_default="[10, 20, 30, 50]")  
     initial_supply: Mapped[int] = mapped_column(Integer, server_default="1000")  
     is_active: Mapped[bool] = mapped_column(Boolean, server_default="true")
-    
+    join_code: Mapped[str | None] = mapped_column(String(32), unique=True, nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

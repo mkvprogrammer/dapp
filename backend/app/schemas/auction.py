@@ -17,6 +17,12 @@ class AuctionCreate(BaseModel):
     lesson_start_time: datetime
     resource_limit: int = Field(..., gt=0)
     password: str = Field(..., description="Пароль организатора для подписи транзакции")
+    resource_type: str = Field(default="consultation", max_length=32)
+    location: str | None = Field(None, max_length=200)
+    description: str | None = None
+    min_bid: Decimal = Field(default=Decimal("1"), gt=0)
+    bid_step: Decimal = Field(default=Decimal("1"), gt=0)
+    image_url: str | None = Field(None, max_length=500)
 
 
 def _enum_to_str(value: str | Enum) -> str:
@@ -52,6 +58,12 @@ class AuctionDetailResponse(BaseModel):
     resource_limit: int
     blockchain_auction_id: int
     status: str
+    resource_type: str | None = None
+    location: str | None = None
+    description: str | None = None
+    min_bid: Decimal | None = None
+    bid_step: Decimal | None = None
+    image_url: str | None = None
     created_at: datetime
 
     @field_validator("status", mode="before")
@@ -104,3 +116,33 @@ class CancelBidResponse(BaseModel):
     auction_id: int
     status: str
     tx_hash: str
+
+
+class AuctionListResponseExtended(BaseModel):
+    id: int
+    project_id: int
+    project_name: str
+    resource_name: str
+    resource_limit: int
+    status: str
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    current_top_bid: Decimal | None = None
+    participants_count: int = 0
+    my_bid_amount: Decimal | None = None
+    my_rank: int | None = None
+    image_url: str | None = None
+
+
+class BidHistoryEntry(BaseModel):
+    id: UUID
+    student_id: str
+    full_name: str
+    amount: Decimal
+    action: str
+    created_at: datetime
+
+
+class BidHistoryResponse(BaseModel):
+    auction_id: int
+    entries: list[BidHistoryEntry]

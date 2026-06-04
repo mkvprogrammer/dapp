@@ -1,7 +1,10 @@
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
@@ -9,7 +12,10 @@ from sqlalchemy.exc import OperationalError
 from app.api.api import api_router
 from app.core.config import get_settings, settings
 from app.core.exceptions import DomainException
-from app.core.handlers import domain_exception_handler
+from app.core.handlers import (
+    domain_exception_handler,
+    request_validation_exception_handler,
+)
 from database import engine
 
 
@@ -42,7 +48,9 @@ app = FastAPI(
 
 _cors = os.getenv(
     "CORS_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000",
+    "http://localhost:5173,http://127.0.0.1:5173,"
+    "http://localhost:3000,http://127.0.0.1:3000,"
+    "http://localhost:3001,http://127.0.0.1:3001",
 )
 app.add_middleware(
     CORSMiddleware,
@@ -53,10 +61,15 @@ app.add_middleware(
 )
 
 # Глобальный перехват доменных ошибок (сервисы → HTTP)
+app.add_exception_handler(RequestValidationError, request_validation_exception_handler)
 app.add_exception_handler(DomainException, domain_exception_handler)
 
 # API v1: /api/v1/auth/...
 app.include_router(api_router)
+
+upload_path = Path(settings.upload_dir)
+upload_path.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(upload_path)), name="uploads")
 
 
 @app.get("/")

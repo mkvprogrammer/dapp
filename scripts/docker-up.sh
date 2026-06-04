@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-echo "==> [1/2] Инициализация infra (genesis, ключи, .env)..."
+echo "==> [1/5] Инициализация infra (genesis, ключи, .env)..."
 docker compose build setup
 docker compose run --rm setup
 
@@ -12,5 +12,18 @@ if [ ! -f infra/.env ]; then
   exit 1
 fi
 
-echo "==> [2/2] Запуск всех сервисов..."
+if [ "${SKIP_IMAGE_PULL:-}" != "1" ]; then
+  echo "==> [2/5] Загрузка базовых образов (Docker Hub)..."
+  ./scripts/pull-base-images.sh
+else
+  echo "==> [2/5] Пропуск pull (SKIP_IMAGE_PULL=1)"
+fi
+
+echo "==> [3/5] Сборка образов..."
+docker compose --env-file infra/.env build
+
+echo "==> [4/5] Миграции БД (Alembic)..."
+./scripts/migrate.sh
+
+echo "==> [5/5] Запуск всех сервисов..."
 exec docker compose --env-file infra/.env up --build "$@"

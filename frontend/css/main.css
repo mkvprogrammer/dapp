@@ -7,6 +7,7 @@
 }
 
 :root {
+  --layout-breakpoint: 960px;
   --color-primary: #6c4dff;
   --color-primary-hover: #5a3de6;
   --color-primary-light: #f0ecff;
