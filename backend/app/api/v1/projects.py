@@ -47,6 +47,7 @@ async def join_by_code(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RoleChecker([UserRole.STUDENT])),
 ) -> ProjectJoinByCodeResponse:
+    """Запись студента на проект по коду приглашения с начислением стартовых токенов."""
     enrollment, project, tx_hash = await project_service.join_project_by_code(
         db, current_user, payload.code
     )
@@ -166,6 +167,7 @@ async def project_balance(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> ProjectBalanceResponse:
+    """Баланс токенов пользователя в проекте: доступно, заморожено в ставках."""
     data = await project_service.get_project_balance_for_user(db, project_id, current_user)
     return ProjectBalanceResponse(**data)
 
@@ -176,6 +178,7 @@ async def organizer_stats(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RoleChecker([UserRole.ORGANIZER, UserRole.ADMIN])),
 ) -> OrganizerStatsResponse:
+    """Аналитика проекта для панели организатора: участники, токены, аукционы."""
     data = await project_service.get_organizer_stats(db, project_id, current_user)
     return OrganizerStatsResponse(**data)
 
@@ -186,5 +189,6 @@ async def attendance_stats(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> AttendanceStatsResponse:
+    """Статистика посещаемости по проекту (средний % и личные визиты студента)."""
     data = await project_service.get_attendance_stats(db, project_id, current_user)
     return AttendanceStatsResponse(**data)

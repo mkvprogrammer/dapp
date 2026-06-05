@@ -41,6 +41,7 @@ async def list_auctions(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> list[AuctionListResponseExtended]:
+    """Список аукционов с фильтрами; для текущего пользователя — его ставка и ранг."""
     rows = await auction_service.list_auctions(
         db, user=current_user, project_id=project_id, status=status, search=search
     )
@@ -53,6 +54,7 @@ async def bid_history(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> BidHistoryResponse:
+    """История событий ставок по аукциону (размещение, повышение, отмена)."""
     entries = await auction_service.get_bid_history(db, auction_id)
     return BidHistoryResponse(
         auction_id=auction_id,

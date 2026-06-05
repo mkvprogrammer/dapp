@@ -41,6 +41,9 @@ async def create_transfer(
     comment: str | None,
     sender_private_key: str,
 ) -> Transfer:
+    """
+    P2P-перевод токенов: проверка участия, баланса, onchain transfer, уведомления.
+    """
     recipient_result = await db.execute(
         select(User).where(User.student_id == recipient_student_id.strip())
     )
@@ -136,6 +139,7 @@ async def list_transfers(
     limit: int,
     offset: int,
 ) -> dict:
+    """История переводов пользователя с направлением и контрагентом."""
     q = select(Transfer).order_by(Transfer.created_at.desc())
     if project_id is not None:
         q = q.where(Transfer.project_id == project_id)
@@ -176,6 +180,7 @@ async def list_transfers(
 
 
 async def recent_recipients(db: AsyncSession, user: User, limit: int = 10) -> list[dict]:
+    """Уникальные недавние получатели исходящих переводов."""
     result = await db.execute(
         select(Transfer.recipient_id)
         .where(Transfer.sender_id == user.id)

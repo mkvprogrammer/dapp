@@ -198,6 +198,7 @@ async def get_project_by_id(db: AsyncSession, project_id: int) -> Project:
 
 
 def _assert_organizer_or_admin(actor: User, project: Project) -> None:
+    """Проверяет, что actor — владелец проекта или администратор."""
     if actor.role == UserRole.ADMIN:
         return
     if actor.role != UserRole.ORGANIZER or project.organizer_id != actor.id:
@@ -209,6 +210,7 @@ async def get_project_members(
     project_id: int,
     actor: User,
 ) -> list[dict]:
+    """Участники проекта с onchain-балансом (доступ: организатор или admin)."""
     project = await get_project_by_id(db, project_id)
     _assert_organizer_or_admin(actor, project)
 
@@ -244,6 +246,7 @@ async def mint_tokens_for_member(
     amount: int,
     actor: User,
 ) -> tuple[UserProject, str]:
+    """Дополнительный mint токенов участнику проекта (организатор или admin)."""
     from uuid import UUID
 
     project = await get_project_by_id(db, project_id)
@@ -333,6 +336,7 @@ async def get_project_balance_for_user(
     project_id: int,
     user: User,
 ) -> dict:
+    """Доступный и замороженный (в ставках) баланс пользователя в проекте."""
     project = await get_project_by_id(db, project_id)
     available = Decimal(
         await blockchain_service.get_token_balance(user.wallet_address, project.blockchain_id)
@@ -354,6 +358,7 @@ async def get_project_balance_for_user(
 
 
 async def get_organizer_stats(db: AsyncSession, project_id: int, actor: User) -> dict:
+    """Метрики проекта для дашборда организатора: участники, токены, графики."""
     from datetime import UTC, datetime, timedelta
 
     project = await get_project_by_id(db, project_id)
@@ -425,6 +430,7 @@ async def get_organizer_stats(db: AsyncSession, project_id: int, actor: User) ->
 
 
 async def get_attendance_stats(db: AsyncSession, project_id: int, user: User) -> dict:
+    """Процент подтверждённых посещений и личная статистика студента."""
     await get_project_by_id(db, project_id)
     total_bids = await db.scalar(
         select(func.count(Bid.id))

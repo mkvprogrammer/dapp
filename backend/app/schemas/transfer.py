@@ -1,3 +1,7 @@
+"""
+Pydantic-схемы P2P-переводов токенов.
+"""
+
 from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
@@ -6,52 +10,66 @@ from pydantic import BaseModel, Field
 
 
 class TransferCreate(BaseModel):
-    recipient_student_id: str = Field(..., min_length=1, max_length=50)
-    project_id: int
-    amount: Decimal = Field(..., gt=0)
-    comment: str | None = Field(None, max_length=500)
-    password: str = Field(..., min_length=1)
+    """Тело запроса на перевод токенов другому участнику проекта."""
+
+    recipient_student_id: str = Field(..., min_length=1, max_length=50, description="ID студента-получателя")
+    project_id: int = Field(..., description="Проект, в рамках которого переводятся токены")
+    amount: Decimal = Field(..., gt=0, description="Сумма перевода")
+    comment: str | None = Field(None, max_length=500, description="Комментарий к переводу")
+    password: str = Field(..., min_length=1, description="Пароль для расшифровки ключа и подписи tx")
 
 
 class TransferResponse(BaseModel):
-    id: UUID
-    project_id: int
-    sender_student_id: str
-    recipient_student_id: str
-    recipient_full_name: str
-    amount: Decimal
-    comment: str | None
-    status: str
-    tx_hash: str | None
-    created_at: datetime
+    """Результат успешного перевода."""
+
+    id: UUID = Field(..., description="ID записи перевода")
+    project_id: int = Field(..., description="ID проекта")
+    sender_student_id: str = Field(..., description="ID отправителя")
+    recipient_student_id: str = Field(..., description="ID получателя")
+    recipient_full_name: str = Field(..., description="ФИО получателя")
+    amount: Decimal = Field(..., description="Сумма")
+    comment: str | None = Field(None, description="Комментарий")
+    status: str = Field(..., description="Статус: completed и др.")
+    tx_hash: str | None = Field(None, description="Хэш onchain-транзакции")
+    created_at: datetime = Field(..., description="Время перевода")
 
 
 class TransferListItem(BaseModel):
-    id: UUID
-    direction: str
-    counterparty_name: str
-    counterparty_student_id: str
-    amount: Decimal
-    comment: str | None
-    status: str
-    created_at: datetime
+    """Элемент истории переводов."""
+
+    id: UUID = Field(..., description="ID перевода")
+    direction: str = Field(..., description="in — входящий, out — исходящий")
+    counterparty_name: str = Field(..., description="ФИО контрагента")
+    counterparty_student_id: str = Field(..., description="ID контрагента")
+    amount: Decimal = Field(..., description="Сумма")
+    comment: str | None = Field(None, description="Комментарий")
+    status: str = Field(..., description="Статус перевода")
+    created_at: datetime = Field(..., description="Дата")
 
 
 class TransferListResponse(BaseModel):
-    items: list[TransferListItem]
-    total: int
+    """Пагинированная история переводов."""
+
+    items: list[TransferListItem] = Field(..., description="Переводы")
+    total: int = Field(..., description="Общее число по фильтру")
 
 
 class RecentRecipient(BaseModel):
-    user_id: UUID
-    student_id: str
-    full_name: str
+    """Недавний получатель для быстрого выбора."""
+
+    user_id: UUID = Field(..., description="UUID получателя")
+    student_id: str = Field(..., description="ID студента")
+    full_name: str = Field(..., description="ФИО")
 
 
 class RecentRecipientsResponse(BaseModel):
-    items: list[RecentRecipient]
+    """Список недавних получателей."""
+
+    items: list[RecentRecipient] = Field(..., description="Получатели")
 
 
 class WalletBalanceResponse(BaseModel):
-    available: Decimal
-    project_id: int | None = None
+    """Краткий ответ баланса кошелька."""
+
+    available: Decimal = Field(..., description="Доступный баланс")
+    project_id: int | None = Field(None, description="ID проекта (null — суммарно)")

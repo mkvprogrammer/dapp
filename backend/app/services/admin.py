@@ -55,6 +55,7 @@ async def update_user_role(db: AsyncSession, user_id: UUID, new_role: UserRole) 
 
 
 async def list_users(db: AsyncSession, search: str | None = None) -> list[User]:
+    """Список всех пользователей с опциональным поиском по student_id и ФИО."""
     query = select(User).order_by(User.student_id)
     if search:
         pattern = f"%{search.strip()}%"
@@ -73,6 +74,7 @@ async def list_users_paginated(
     limit: int,
     offset: int,
 ) -> dict:
+    """Пагинированный список пользователей с фильтром по роли."""
     q = select(User)
     if search:
         pattern = f"%{search.strip()}%"
@@ -91,6 +93,7 @@ async def list_audit_log(
     limit: int,
     offset: int,
 ) -> dict:
+    """Журнал аудита с именами акторов и пагинацией."""
     q = select(AuditLog).order_by(AuditLog.created_at.desc())
     if event_type:
         q = q.where(AuditLog.event_type == event_type)
@@ -120,6 +123,7 @@ async def list_audit_log(
 
 
 async def emergency_stop_auctions(db: AsyncSession, actor: User, reason: str) -> int:
+    """Отменяет все открытые аукционы в БД и пишет запись в audit log."""
     now = datetime.now(UTC)
     result = await db.execute(
         select(Auction).where(
@@ -142,6 +146,7 @@ async def emergency_stop_auctions(db: AsyncSession, actor: User, reason: str) ->
 
 
 async def get_admin_health(db: AsyncSession) -> dict:
+    """Проверяет доступность PostgreSQL и блокчейна, возвращает метрики аукционов."""
     t0 = time.perf_counter()
     try:
         await db.execute(select(func.count(User.id)))

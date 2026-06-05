@@ -22,6 +22,7 @@ async def list_notifications(
     limit: int,
     offset: int,
 ) -> dict:
+    """Список уведомлений пользователя с подсчётом непрочитанных."""
     q = select(Notification).where(Notification.user_id == user_id)
     if ntype:
         q = q.where(Notification.type == ntype)
@@ -42,6 +43,7 @@ async def list_notifications(
 
 
 async def mark_read(db: AsyncSession, user_id: UUID, notification_id: UUID) -> Notification:
+    """Помечает одно уведомление прочитанным (только своё)."""
     result = await db.execute(
         select(Notification).where(
             Notification.id == notification_id,
@@ -58,6 +60,7 @@ async def mark_read(db: AsyncSession, user_id: UUID, notification_id: UUID) -> N
 
 
 async def mark_all_read(db: AsyncSession, user_id: UUID) -> int:
+    """Помечает все непрочитанные уведомления пользователя прочитанными."""
     result = await db.execute(
         select(Notification).where(
             Notification.user_id == user_id,

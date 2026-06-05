@@ -1,3 +1,7 @@
+"""
+HTTP-ручка главной страницы: агрегированные данные дашборда.
+"""
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,5 +19,6 @@ async def get_dashboard(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> DashboardResponse:
+    """Сводка для главной: балансы, проекты, активные аукционы, уведомления, активность."""
     data = await dashboard_service.get_dashboard(db, current_user)
     return DashboardResponse(**data)

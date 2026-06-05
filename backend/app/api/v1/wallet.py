@@ -1,3 +1,7 @@
+"""
+HTTP-ручки кошелька: баланс и демо-пополнение (только dev).
+"""
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,6 +25,7 @@ async def wallet_balance(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> WalletBalanceResponse:
+    """Доступный баланс: по проекту или суммарно по всем проектам."""
     if project_id is not None:
         bal = await project_service.get_project_balance_for_user(db, project_id, current_user)
         return WalletBalanceResponse(available=bal["available"], project_id=project_id)
@@ -35,6 +40,7 @@ async def demo_top_up(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """Демо-начисление токенов onchain (только при DEBUG или ALLOW_DEMO_TOPUP)."""
     if not settings.debug and not settings.allow_demo_topup:
         from fastapi import HTTPException
         raise HTTPException(403, "Demo top-up отключён")

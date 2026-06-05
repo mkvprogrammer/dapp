@@ -35,6 +35,7 @@ async def list_users(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RoleChecker([UserRole.ADMIN])),
 ) -> AdminUserListResponse:
+    """Список пользователей с поиском, фильтром по роли и пагинацией."""
     data = await admin_service.list_users_paginated(
         db, search=search, role=role, limit=limit, offset=offset
     )
@@ -52,6 +53,7 @@ async def audit_log(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RoleChecker([UserRole.ADMIN])),
 ) -> AuditLogResponse:
+    """Журнал аудита: действия пользователей и системные события."""
     data = await admin_service.list_audit_log(
         db, event_type=event_type, limit=limit, offset=offset
     )
@@ -68,6 +70,7 @@ async def emergency_stop(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RoleChecker([UserRole.ADMIN])),
 ) -> EmergencyStopResponse:
+    """Экстренная остановка всех открытых аукционов (только в БД, без onchain)."""
     count = await admin_service.emergency_stop_auctions(db, current_user, payload.reason)
     return EmergencyStopResponse(
         stopped_auctions_count=count,
@@ -80,6 +83,7 @@ async def admin_health(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RoleChecker([UserRole.ADMIN])),
 ) -> AdminHealthResponse:
+    """Сводка здоровья стека: PostgreSQL, блокчейн, метрики аукционов."""
     data = await admin_service.get_admin_health(db)
     return AdminHealthResponse(
         services=[ServiceHealth(**s) for s in data["services"]],

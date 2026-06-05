@@ -1,3 +1,7 @@
+"""
+HTTP-ручки P2P-переводов токенов между участниками проекта.
+"""
+
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,6 +27,7 @@ async def create_transfer(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RoleChecker([UserRole.STUDENT, UserRole.ORGANIZER])),
 ) -> TransferResponse:
+    """Перевод токенов ERC-1155 другому участнику того же проекта."""
     sender_key = decrypt_wallet_private_key(
         current_user.encrypted_private_key, payload.password
     )
@@ -60,6 +65,7 @@ async def list_transfers(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> TransferListResponse:
+    """История входящих и исходящих переводов с пагинацией."""
     data = await transfer_service.list_transfers(
         db, current_user, project_id=project_id, direction=direction, limit=limit, offset=offset
     )
@@ -71,6 +77,7 @@ async def recent_recipients(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> RecentRecipientsResponse:
+    """Недавние получатели переводов для быстрого выбора в UI."""
     items = await transfer_service.recent_recipients(db, current_user)
     return RecentRecipientsResponse(items=items)
 
@@ -80,6 +87,7 @@ async def export_transfers_csv(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """Экспорт истории переводов текущего пользователя в CSV."""
     data = await transfer_service.list_transfers(
         db, current_user, project_id=None, direction="all", limit=1000, offset=0
     )

@@ -20,6 +20,7 @@ from app.models.user import User
 
 
 async def get_profile(db: AsyncSession, user: User) -> dict:
+    """Агрегированная статистика профиля: участия, победы, посещения."""
     participations = await db.scalar(
         select(func.count(Bid.id)).where(Bid.user_id == user.id)
     )
@@ -53,6 +54,7 @@ async def update_profile(
     full_name: str | None,
     faculty: str | None,
 ) -> User:
+    """Обновляет редактируемые поля профиля (full_name, faculty)."""
     if full_name is not None:
         user.full_name = full_name
     if faculty is not None:
@@ -63,6 +65,7 @@ async def update_profile(
 
 
 async def get_balances(db: AsyncSession, user: User) -> dict:
+    """Сводный баланс и разбивка по проектам (available/frozen из chain и БД)."""
     enrollments = await db.execute(
         select(Project, UserProject)
         .join(UserProject, UserProject.project_id == Project.id)
@@ -104,6 +107,7 @@ async def get_balances(db: AsyncSession, user: User) -> dict:
 
 
 async def get_activity(db: AsyncSession, user: User, limit: int, offset: int) -> dict:
+    """Объединённая лента ставок и переводов, отсортированная по дате."""
     items: list[dict] = []
 
     bids = await db.execute(
@@ -159,6 +163,7 @@ async def get_activity(db: AsyncSession, user: User, limit: int, offset: int) ->
 
 
 async def get_active_auctions(db: AsyncSession, user: User) -> list[dict]:
+    """Открытые аукционы с активной ставкой пользователя и его рангом onchain."""
     now = datetime.now(UTC)
     result = await db.execute(
         select(Auction, Project, Bid)

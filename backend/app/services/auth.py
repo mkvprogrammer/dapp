@@ -51,6 +51,11 @@ def _token_payload(user: User) -> dict[str, str]:
 
 
 async def register_user(db: AsyncSession, schema: UserRegister) -> tuple[User, str]:
+  """
+  Регистрирует студента: кошелёк, шифрование ключа, USER_ROLE onchain, запись в БД.
+
+  Возвращает пользователя и сырой приватный ключ (отдаётся клиенту один раз).
+  """
   # 1. Проверка уникальности student_id
   result = await db.execute(
     select(User).where(User.student_id == schema.student_id)
@@ -99,6 +104,7 @@ async def register_user(db: AsyncSession, schema: UserRegister) -> tuple[User, s
 
 
 async def authenticate_user(db: AsyncSession, schema: UserLogin) -> User:
+  """Проверяет student_id и пароль; обновляет last_login_at."""
   result = await db.execute(
     select(User).where(User.student_id == schema.student_id)
   )
@@ -114,6 +120,7 @@ async def authenticate_user(db: AsyncSession, schema: UserLogin) -> User:
 
 
 async def create_jwt_tokens(db: AsyncSession, user: User) -> TokenPair:
+  """Выпускает access/refresh JWT и сохраняет хэш refresh-токена в БД."""
   payload = _token_payload(user)
 
   # 1. Выпуск пары JWT
@@ -135,6 +142,7 @@ async def create_jwt_tokens(db: AsyncSession, user: User) -> TokenPair:
 
 
 async def refresh_access_token(db: AsyncSession, refresh_token: str) -> TokenPair:
+  """Ротация refresh-токена: отзыв старого, выпуск новой пары JWT."""
   token_hash = _hash_refresh_token(refresh_token)
   now = datetime.now(UTC)
 

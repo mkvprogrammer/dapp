@@ -1,3 +1,7 @@
+"""
+HTTP-ручки профиля, балансов и активности текущего пользователя.
+"""
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,6 +29,7 @@ async def list_my_projects(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> list[MyProjectResponse]:
+    """Проекты, на которые записан текущий пользователь, с onchain-балансом."""
     rows = await project_service.get_user_projects(db, current_user)
     if is_active is not None:
         rows = [r for r in rows if r["is_active"] == is_active]
@@ -39,6 +44,7 @@ async def get_my_profile(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> UserProfileResponse:
+    """Профиль и агрегированная статистика текущего пользователя."""
     data = await user_service.get_profile(db, current_user)
     return UserProfileResponse(
         user_id=current_user.id,
@@ -58,6 +64,7 @@ async def patch_my_profile(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> UserProfileResponse:
+    """Частичное обновление ФИО и факультета в профиле."""
     user = await user_service.update_profile(
         db,
         current_user,
@@ -82,6 +89,7 @@ async def get_my_balances(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> UserBalancesResponse:
+    """Сводный и помесячный баланс токенов по всем проектам пользователя."""
     data = await user_service.get_balances(db, current_user)
     return UserBalancesResponse(**data)
 
@@ -93,6 +101,7 @@ async def get_my_activity(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> ActivityListResponse:
+    """Лента активности: ставки на аукционах и переводы токенов."""
     data = await user_service.get_activity(db, current_user, limit=limit, offset=offset)
     return ActivityListResponse(**data)
 
@@ -102,5 +111,6 @@ async def get_my_active_auctions(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> MyActiveAuctionsResponse:
+    """Открытые аукционы, в которых у пользователя есть активная ставка."""
     items = await user_service.get_active_auctions(db, current_user)
     return MyActiveAuctionsResponse(items=items)

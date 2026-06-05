@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 async def _get_auction_with_project(db: AsyncSession, auction_id: int) -> tuple[Auction, Project]:
+    """Загружает аукцион вместе с проектом или выбрасывает AuctionNotFoundError."""
     result = await db.execute(
         select(Auction, Project)
         .join(Project, Project.id == Auction.project_id)
@@ -43,6 +44,7 @@ async def _get_auction_with_project(db: AsyncSession, auction_id: int) -> tuple[
 
 
 def _assert_organizer_may_manage(organizer: User, project: Project) -> None:
+    """Только организатор-владелец проекта может управлять посещаемостью."""
     if organizer.role != UserRole.ORGANIZER or project.organizer_id != organizer.id:
         raise ProjectAccessDeniedError()
 
@@ -52,6 +54,7 @@ async def _get_student_bid(
     auction_id: int,
     student_id: str,
 ) -> tuple[User, Bid]:
+    """Находит студента и его активную ставку на аукционе."""
     user_result = await db.execute(select(User).where(User.student_id == student_id))
     student = user_result.scalar_one_or_none()
     if student is None:
@@ -71,6 +74,7 @@ async def _get_student_bid(
 
 
 def _attendance_label(bid: Bid | None) -> str:
+    """Человекочитаемый статус посещения по состоянию ставки."""
     if bid is None or bid.amount <= 0:
         return "no_bid"
     if bid.status == BidStatus.REFUNDED:
@@ -89,6 +93,7 @@ async def list_attendance(
     auction_id: int,
     viewer: User,
 ) -> tuple[Auction, list[dict]]:
+    """Список участников аукциона со ставками и меткой посещаемости."""
     auction, project = await _get_auction_with_project(db, auction_id)
     _assert_organizer_may_manage(viewer, project)
 
@@ -177,6 +182,7 @@ async def mark_student_absent(
     organizer: User,
     organizer_private_key: str,
 ) -> tuple[str, str]:
+    """Отмечает прогул студента onchain (markAsAbsent) и обновляет статус ставки."""
     auction, project = await _get_auction_with_project(db, auction_id)
     _assert_organizer_may_manage(organizer, project)
 
@@ -219,6 +225,7 @@ async def close_lesson_day(
     organizer: User,
     organizer_private_key: str,
 ) -> str:
+    """Закрывает день занятия: onchain возвраты/штрафы и статус CLOSED в БД."""
     auction, project = await _get_auction_with_project(db, auction_id)
     _assert_organizer_may_manage(organizer, project)
 

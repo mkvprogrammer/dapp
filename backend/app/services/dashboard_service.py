@@ -18,6 +18,7 @@ from app.services import user_service
 
 
 async def get_dashboard(db: AsyncSession, user: User) -> dict:
+    """Собирает данные главной страницы: балансы, проекты, аукционы, уведомления."""
     balances = await user_service.get_balances(db, user)
     now = datetime.now(UTC)
 

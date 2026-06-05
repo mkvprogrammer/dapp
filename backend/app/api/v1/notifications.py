@@ -1,3 +1,7 @@
+"""
+HTTP-ручки in-app уведомлений пользователя.
+"""
+
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
@@ -25,6 +29,7 @@ async def list_notifications(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> NotificationListResponse:
+    """Список уведомлений с фильтром по типу и непрочитанным."""
     data = await notification_service.list_notifications(
         db,
         current_user.id,
@@ -56,6 +61,7 @@ async def mark_all_read(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> NotificationReadAllResponse:
+    """Пометить все уведомления пользователя как прочитанные."""
     count = await notification_service.mark_all_read(db, current_user.id)
     return NotificationReadAllResponse(updated_count=count)
 
@@ -66,5 +72,6 @@ async def mark_read(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> NotificationReadResponse:
+    """Пометить одно уведомление как прочитанное."""
     row = await notification_service.mark_read(db, current_user.id, notification_id)
     return NotificationReadResponse(id=row.id, is_read=row.is_read)

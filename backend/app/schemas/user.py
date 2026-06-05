@@ -1,3 +1,7 @@
+"""
+Pydantic-схемы профиля, балансов и активности пользователя.
+"""
+
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
@@ -7,23 +11,27 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class UserStatsResponse(BaseModel):
-    won_auctions: int
-    auction_participations: int
-    tokens_earned: Decimal
-    confirmed_attendance_hours: Decimal
+    """Агрегированная статистика пользователя."""
+
+    won_auctions: int = Field(..., description="Число выигранных аукционов")
+    auction_participations: int = Field(..., description="Всего участий в аукционах")
+    tokens_earned: Decimal = Field(..., description="Заработано токенов (резерв)")
+    confirmed_attendance_hours: Decimal = Field(..., description="Подтверждённые посещения")
 
 
 class UserProfileResponse(BaseModel):
+    """Полный профиль текущего пользователя со статистикой."""
+
     model_config = ConfigDict(from_attributes=True)
 
-    user_id: UUID = Field(validation_alias="id")
-    student_id: str
-    full_name: str
-    faculty: str | None = None
-    wallet_address: str
-    role: str
-    stats: UserStatsResponse
-    created_at: datetime
+    user_id: UUID = Field(validation_alias="id", description="UUID пользователя")
+    student_id: str = Field(..., description="ID студента")
+    full_name: str = Field(..., description="ФИО")
+    faculty: str | None = Field(None, description="Факультет")
+    wallet_address: str = Field(..., description="Адрес кошелька")
+    role: str = Field(..., description="Роль в системе")
+    stats: UserStatsResponse = Field(..., description="Статистика активности")
+    created_at: datetime = Field(..., description="Дата регистрации")
 
     @field_validator("role", mode="before")
     @classmethod
@@ -32,53 +40,67 @@ class UserProfileResponse(BaseModel):
 
 
 class UserProfileUpdate(BaseModel):
-    full_name: str | None = Field(None, min_length=2, max_length=150)
-    faculty: str | None = Field(None, max_length=200)
+    """Частичное обновление профиля (PATCH)."""
+
+    full_name: str | None = Field(None, min_length=2, max_length=150, description="Новое ФИО")
+    faculty: str | None = Field(None, max_length=200, description="Факультет")
 
 
 class ProjectBalanceItem(BaseModel):
-    project_id: int
-    project_name: str
-    available: Decimal
-    frozen: Decimal
-    pending_refund: Decimal
+    """Баланс токенов пользователя в одном проекте."""
+
+    project_id: int = Field(..., description="ID проекта")
+    project_name: str = Field(..., description="Название проекта")
+    available: Decimal = Field(..., description="Доступно onchain")
+    frozen: Decimal = Field(..., description="Заморожено в активных ставках")
+    pending_refund: Decimal = Field(..., description="Ожидаемый возврат")
 
 
 class UserBalancesResponse(BaseModel):
-    total: Decimal
-    available: Decimal
-    frozen: Decimal
-    pending_refund: Decimal
-    by_project: list[ProjectBalanceItem]
+    """Сводный баланс по всем проектам пользователя."""
+
+    total: Decimal = Field(..., description="Сумма available + frozen")
+    available: Decimal = Field(..., description="Доступно к трате")
+    frozen: Decimal = Field(..., description="В ставках")
+    pending_refund: Decimal = Field(..., description="Ожидаемые возвраты")
+    by_project: list[ProjectBalanceItem] = Field(..., description="Разбивка по проектам")
 
 
 class ActivityItem(BaseModel):
-    id: UUID
-    type: str
-    title: str
-    description: str
-    project_id: int | None = None
-    project_name: str | None = None
-    amount_delta: Decimal | None = None
-    created_at: datetime
+    """Элемент ленты активности."""
+
+    id: UUID = Field(..., description="ID события")
+    type: str = Field(..., description="Тип: auction_bid, transfer_in, transfer_out")
+    title: str = Field(..., description="Заголовок")
+    description: str = Field(..., description="Краткое описание")
+    project_id: int | None = Field(None, description="Связанный проект")
+    project_name: str | None = Field(None, description="Название проекта")
+    amount_delta: Decimal | None = Field(None, description="Изменение баланса (+/-)")
+    created_at: datetime = Field(..., description="Время события")
 
 
 class ActivityListResponse(BaseModel):
-    items: list[ActivityItem]
-    total: int
+    """Пагинированная лента активности."""
+
+    items: list[ActivityItem] = Field(..., description="События")
+    total: int = Field(..., description="Общее число событий в выборке")
 
 
 class MyActiveAuctionItem(BaseModel):
-    auction_id: int
-    project_id: int
-    resource_name: str
-    project_name: str
-    my_bid_amount: Decimal
-    my_rank: int
-    participants_count: int
-    end_time: datetime
-    time_left_seconds: int
+    """Активный аукцион, в котором участвует пользователь."""
+
+    auction_id: int = Field(..., description="ID аукциона")
+    project_id: int = Field(..., description="ID проекта")
+    resource_name: str = Field(..., description="Название ресурса")
+    project_name: str = Field(..., description="Название проекта")
+    my_bid_amount: Decimal = Field(..., description="Сумма текущей ставки")
+    my_rank: int = Field(..., description="Позиция в лидерборде")
+    participants_count: int = Field(..., description="Число участников")
+    end_time: datetime = Field(..., description="Окончание торгов")
+    time_left_seconds: int = Field(..., description="Секунд до конца торгов")
 
 
 class MyActiveAuctionsResponse(BaseModel):
-    items: list[MyActiveAuctionItem]
+    """Список активных аукционов с ставкой пользователя."""
+
+    items: list[MyActiveAuctionItem] = Field(..., description="Аукционы")

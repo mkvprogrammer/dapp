@@ -42,6 +42,7 @@ logger = logging.getLogger(__name__)
 
 
 def _to_utc(dt: datetime) -> datetime:
+    """Приводит datetime к UTC (naive считается UTC)."""
     if dt.tzinfo is None:
         return dt.replace(tzinfo=UTC)
     return dt.astimezone(UTC)
@@ -168,6 +169,7 @@ async def create_auction(
 
 
 async def _get_auction_or_raise(db: AsyncSession, auction_id: int) -> Auction:
+    """Возвращает аукцион по ID или выбрасывает AuctionNotFoundError."""
     result = await db.execute(select(Auction).where(Auction.id == auction_id))
     auction = result.scalar_one_or_none()
     if auction is None:
@@ -176,6 +178,7 @@ async def _get_auction_or_raise(db: AsyncSession, auction_id: int) -> Auction:
 
 
 def _ensure_auction_open(auction: Auction) -> None:
+    """Проверяет, что аукцион открыт и торги ещё не завершены."""
     now = datetime.now(UTC)
     if auction.status != AuctionStatus.OPEN or auction.end_time <= now:
         raise AuctionClosedError()
@@ -344,6 +347,7 @@ async def list_auctions(
     status: str,
     search: str | None,
 ) -> list[dict]:
+    """Список аукционов с агрегатами: топ-ставка, участники, ставка и ранг текущего user."""
     now = datetime.now(UTC)
     q = select(Auction, Project).join(Project, Project.id == Auction.project_id)
     if project_id is not None:
@@ -424,6 +428,7 @@ async def list_auctions(
 
 
 async def get_bid_history(db: AsyncSession, auction_id: int) -> list[dict]:
+    """Хронология событий ставок (BidEvent) с данными студентов."""
     await _get_auction_or_raise(db, auction_id)
     result = await db.execute(
         select(BidEvent, User)
@@ -456,6 +461,7 @@ async def get_open_auctions(db: AsyncSession) -> list[Auction]:
 
 
 async def get_auction_by_id(db: AsyncSession, auction_id: int) -> Auction:
+    """Публичная обёртка: аукцион по ID или AuctionNotFoundError."""
     return await _get_auction_or_raise(db, auction_id)
 
 

@@ -74,12 +74,13 @@ app.mount("/uploads", StaticFiles(directory=str(upload_path)), name="uploads")
 
 @app.get("/")
 async def root():
+    """Корневой эндпоинт: имя приложения и статус работы."""
     return {"message": settings.app_name, "status": "running"}
 
 
-# эндпоинт для мониторинга
 @app.get("/health")
 async def health():
+    """Проверка здоровья API и подключения к PostgreSQL."""
     async with engine.connect() as conn:
         await conn.execute(text("SELECT 1"))
     return {"status": "ok", "database": "connected"}

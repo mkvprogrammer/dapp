@@ -11,18 +11,20 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class AuctionCreate(BaseModel):
-    project_id: int
-    resource_name: str = Field(..., min_length=3, max_length=150)
-    duration_seconds: int = Field(..., gt=0)
-    lesson_start_time: datetime
-    resource_limit: int = Field(..., gt=0)
-    password: str = Field(..., description="Пароль организатора для подписи транзакции")
-    resource_type: str = Field(default="consultation", max_length=32)
-    location: str | None = Field(None, max_length=200)
-    description: str | None = None
-    min_bid: Decimal = Field(default=Decimal("1"), gt=0)
-    bid_step: Decimal = Field(default=Decimal("1"), gt=0)
-    image_url: str | None = Field(None, max_length=500)
+    """Тело запроса на создание аукциона."""
+
+    project_id: int = Field(..., description="ID проекта в БД")
+    resource_name: str = Field(..., min_length=3, max_length=150, description="Название ресурса")
+    duration_seconds: int = Field(..., gt=0, description="Длительность торгов в секундах")
+    lesson_start_time: datetime = Field(..., description="Время начала занятия (UTC)")
+    resource_limit: int = Field(..., gt=0, description="Число гарантированных мест")
+    password: str = Field(..., description="Пароль создателя для подписи транзакции")
+    resource_type: str = Field(default="consultation", max_length=32, description="Тип ресурса")
+    location: str | None = Field(None, max_length=200, description="Место проведения")
+    description: str | None = Field(None, description="Описание аукциона")
+    min_bid: Decimal = Field(default=Decimal("1"), gt=0, description="Минимальная ставка")
+    bid_step: Decimal = Field(default=Decimal("1"), gt=0, description="Шаг повышения ставки")
+    image_url: str | None = Field(None, max_length=500, description="URL изображения")
 
 
 def _enum_to_str(value: str | Enum) -> str:
@@ -32,13 +34,15 @@ def _enum_to_str(value: str | Enum) -> str:
 
 
 class AuctionListResponse(BaseModel):
+    """Краткая карточка аукциона в списке."""
+
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
-    project_id: int
-    resource_name: str
-    resource_limit: int
-    status: str
+    id: int = Field(..., description="ID аукциона")
+    project_id: int = Field(..., description="ID проекта")
+    resource_name: str = Field(..., description="Название ресурса")
+    resource_limit: int = Field(..., description="Лимит мест")
+    status: str = Field(..., description="open, closed, cancelled")
 
     @field_validator("status", mode="before")
     @classmethod
@@ -47,24 +51,26 @@ class AuctionListResponse(BaseModel):
 
 
 class AuctionDetailResponse(BaseModel):
+    """Полные детали аукциона."""
+
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
-    project_id: int
-    resource_name: str
-    start_time: datetime
-    end_time: datetime
-    lesson_start_time: datetime
-    resource_limit: int
-    blockchain_auction_id: int
-    status: str
-    resource_type: str | None = None
-    location: str | None = None
-    description: str | None = None
-    min_bid: Decimal | None = None
-    bid_step: Decimal | None = None
-    image_url: str | None = None
-    created_at: datetime
+    id: int = Field(..., description="ID аукциона")
+    project_id: int = Field(..., description="ID проекта")
+    resource_name: str = Field(..., description="Название ресурса")
+    start_time: datetime = Field(..., description="Начало торгов")
+    end_time: datetime = Field(..., description="Окончание торгов")
+    lesson_start_time: datetime = Field(..., description="Начало занятия")
+    resource_limit: int = Field(..., description="Гарантированных мест")
+    blockchain_auction_id: int = Field(..., description="ID в AuctionManager")
+    status: str = Field(..., description="Статус аукциона")
+    resource_type: str | None = Field(None, description="Тип ресурса")
+    location: str | None = Field(None, description="Место")
+    description: str | None = Field(None, description="Описание")
+    min_bid: Decimal | None = Field(None, description="Минимальная ставка")
+    bid_step: Decimal | None = Field(None, description="Шаг ставки")
+    image_url: str | None = Field(None, description="URL изображения")
+    created_at: datetime = Field(..., description="Дата создания")
 
     @field_validator("status", mode="before")
     @classmethod
@@ -73,76 +79,96 @@ class AuctionDetailResponse(BaseModel):
 
 
 class AuctionCreatedResponse(BaseModel):
-    id: int
-    resource_name: str
-    blockchain_auction_id: int
-    tx_hash: str
+    """Ответ после создания аукциона."""
+
+    id: int = Field(..., description="ID аукциона в БД")
+    resource_name: str = Field(..., description="Название ресурса")
+    blockchain_auction_id: int = Field(..., description="ID onchain")
+    tx_hash: str = Field(..., description="Хэш транзакции создания")
 
 
 class BidCreate(BaseModel):
-    amount: Decimal = Field(..., gt=0)
+    """Тело запроса на размещение или повышение ставки."""
+
+    amount: Decimal = Field(..., gt=0, description="Сумма ставки (или дополнение)")
     password: str = Field(..., description="Пароль студента для approve/placeBid")
 
 
 class BidCancelRequest(BaseModel):
-    password: str
+    """Тело запроса на отмену ставки."""
+
+    password: str = Field(..., description="Пароль студента для подписи cancelBid")
 
 
 class BidResponse(BaseModel):
+    """Результат размещения ставки."""
+
     model_config = ConfigDict(from_attributes=True)
 
-    id: UUID
-    auction_id: int
-    user_id: UUID
-    amount: Decimal
-    status: str
-    tx_hash: str
+    id: UUID = Field(..., description="ID ставки")
+    auction_id: int = Field(..., description="ID аукциона")
+    user_id: UUID = Field(..., description="ID студента")
+    amount: Decimal = Field(..., description="Итоговая сумма ставки")
+    status: str = Field(..., description="Статус: locked, refunded и др.")
+    tx_hash: str = Field(..., description="Хэш onchain-транзакции")
 
 
 class LeaderboardEntry(BaseModel):
-    wallet_address: str
-    student_id: str
-    full_name: str
-    amount: Decimal
-    is_guaranteed: bool
+    """Участник лидерборда аукциона."""
+
+    wallet_address: str = Field(..., description="Адрес кошелька")
+    student_id: str = Field(..., description="ID студента")
+    full_name: str = Field(..., description="ФИО")
+    amount: Decimal = Field(..., description="Сумма ставки")
+    is_guaranteed: bool = Field(..., description="Входит в топ resource_limit")
 
 
 class LeaderboardResponse(BaseModel):
-    auction_id: int
-    entries: list[LeaderboardEntry]
+    """Лидерборд ставок аукциона."""
+
+    auction_id: int = Field(..., description="ID аукциона")
+    entries: list[LeaderboardEntry] = Field(..., description="Участники по убыванию ставки")
 
 
 class CancelBidResponse(BaseModel):
-    auction_id: int
-    status: str
-    tx_hash: str
+    """Ответ после отмены ставки."""
+
+    auction_id: int = Field(..., description="ID аукциона")
+    status: str = Field(..., description="Новый статус ставки")
+    tx_hash: str = Field(..., description="Хэш onchain-транзакции")
 
 
 class AuctionListResponseExtended(BaseModel):
-    id: int
-    project_id: int
-    project_name: str
-    resource_name: str
-    resource_limit: int
-    status: str
-    start_time: datetime | None = None
-    end_time: datetime | None = None
-    current_top_bid: Decimal | None = None
-    participants_count: int = 0
-    my_bid_amount: Decimal | None = None
-    my_rank: int | None = None
-    image_url: str | None = None
+    """Расширенная карточка аукциона для списка с агрегатами."""
+
+    id: int = Field(..., description="ID аукциона")
+    project_id: int = Field(..., description="ID проекта")
+    project_name: str = Field(..., description="Название проекта")
+    resource_name: str = Field(..., description="Название ресурса")
+    resource_limit: int = Field(..., description="Лимит мест")
+    status: str = Field(..., description="Статус")
+    start_time: datetime | None = Field(None, description="Начало торгов")
+    end_time: datetime | None = Field(None, description="Окончание торгов")
+    current_top_bid: Decimal | None = Field(None, description="Максимальная ставка")
+    participants_count: int = Field(0, description="Число участников")
+    my_bid_amount: Decimal | None = Field(None, description="Ставка текущего пользователя")
+    my_rank: int | None = Field(None, description="Ранг текущего пользователя")
+    image_url: str | None = Field(None, description="URL изображения")
 
 
 class BidHistoryEntry(BaseModel):
-    id: UUID
-    student_id: str
-    full_name: str
-    amount: Decimal
-    action: str
-    created_at: datetime
+    """Событие в истории ставок."""
+
+    id: UUID = Field(..., description="ID события")
+    student_id: str = Field(..., description="ID студента")
+    full_name: str = Field(..., description="ФИО")
+    amount: Decimal = Field(..., description="Сумма операции")
+    action: str = Field(..., description="placed, raised, cancelled")
+    created_at: datetime = Field(..., description="Время события")
 
 
 class BidHistoryResponse(BaseModel):
-    auction_id: int
-    entries: list[BidHistoryEntry]
+    """История событий ставок по аукциону."""
+
+    auction_id: int = Field(..., description="ID аукциона")
+    entries: list[BidHistoryEntry] = Field(..., description="События в хронологическом порядке")
