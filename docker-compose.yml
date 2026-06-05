@@ -2,7 +2,7 @@
 #
 #   docker compose up --build
 #
-# UI:        http://localhost:3000
+# UI:        http://localhost:3001
 # API docs:  http://localhost:8000/docs
 # PgAdmin:   http://localhost:8081
 
@@ -223,7 +223,7 @@ services:
       - path: ./infra/.env
         required: false
     environment:
-      DB_HOST: db
+      DB_HOST: db 
       DB_PORT: "5432"
       BLOCKCHAIN_URL: http://node1:8545
       CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001

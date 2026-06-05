@@ -1,6 +1,11 @@
 #!/bin/sh
 set -eu
 
+# docker compose run backend <cmd> — только переданная команда (миграции без API)
+if [ "$#" -gt 0 ]; then
+  exec "$@"
+fi
+
 echo "==> Waiting for PostgreSQL at ${DB_HOST:-db}:${DB_PORT:-5432} ..."
 python - <<'PY'
 import os, socket, time
